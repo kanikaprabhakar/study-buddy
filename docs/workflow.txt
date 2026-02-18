@@ -1,0 +1,300 @@
+Study Buddy Project Workflow (Step-by-Step)
+
+This is the full professional development flow, but in a simple builder-friendly way.
+
+PHASE 0: Product Foundation (Before Any Code)
+Step 1: Lock the Core Idea
+
+Write the one-liner:
+
+Study Buddy is an aesthetic study planner app with built-in scheduling, Pomodoro focus, DSA tracking, and motivation.
+
+Do not expand scope yet.
+
+Step 2: Define the MVP (Minimum Viable Product)
+
+Your MVP should include only:
+
+Login/signup
+
+Dashboard
+
+Weekly planner
+
+Pomodoro timer
+
+Striver sheet tracker
+
+Quotes + streak
+
+Not Google Calendar yet (Phase 2).
+
+Step 3: Write the Core Documents (Done Already)
+
+You need these stored in /docs:
+
+SRS (requirements)
+
+Schema design doc
+
+Feature list + MVP scope
+
+Roadmap phases
+
+This prevents random building.
+
+PHASE 1: System Design + Architecture
+Step 4: Decide the Stack (Final)
+
+Frontend: Next.js
+Auth: Clerk
+Database: Supabase Postgres
+Backend: Node/Next API routes
+Deployment: Vercel
+
+Step 5: Plan the App Modules
+
+Break Study Buddy into clear modules:
+
+Auth Module
+
+Dashboard Module
+
+Weekly Planner Module
+
+Pomodoro Module
+
+DSA Tracker Module
+
+Motivation Module
+
+Calendar Integration Module (later)
+
+This is your folder structure base.
+
+Step 6: Finalize Database Schema
+
+Create tables first:
+
+users
+
+study_tasks
+
+pomodoro_sessions
+
+dsa_questions
+
+dsa_progress
+
+quotes
+
+Supabase should be ready before UI.
+
+PHASE 2: Project Setup
+Step 7: Initialize the Next.js Project
+
+Create repo + base project.
+
+Set up:
+
+TailwindCSS
+
+shadcn/ui
+
+Basic routing
+
+No features yet.
+
+Step 8: Connect Clerk Authentication
+
+Do auth early because everything depends on users.
+
+Milestone:
+
+User can sign up
+
+User lands on dashboard after login
+
+Step 9: Connect Supabase Database
+
+Set up:
+
+Supabase project
+
+Tables created
+
+Clerk user ID stored in users
+
+Milestone:
+
+Each logged-in user has DB entry
+
+PHASE 3: Build MVP Features in Correct Order
+Step 10: Build Dashboard Skeleton
+
+Dashboard should show placeholders:
+
+Weekly plan section
+
+Pomodoro section
+
+DSA tracker section
+
+Quote section
+
+No logic yet.
+
+Step 11: Weekly Planner Feature (Core)
+
+Implement:
+
+User selects weekly goal
+
+App generates tasks for Mon–Fri
+
+Tasks stored in study_tasks
+
+Milestone:
+
+Weekly plan appears on dashboard
+
+Step 12: Pomodoro Timer Feature
+
+Build timer with:
+
+Start/pause/reset
+
+Save completed sessions to DB
+
+Milestone:
+
+Focus sessions tracked per user
+
+Step 13: Quotes + Motivation Feature
+
+Add:
+
+Quote of the day
+
+Streak counter
+
+Milestone:
+
+App feels alive, not robotic
+
+Step 14: Striver Sheet Tracker
+
+Workflow:
+
+Seed dsa_questions once
+
+User checks questions off
+
+Progress stored in dsa_progress
+
+Milestone:
+
+User can track DSA properly
+
+PHASE 4: Polish the Aesthetic Planner Experience
+Step 15: UI Styling + Theme System
+
+Add:
+
+Pastel themes
+
+Rounded planner cards
+
+Cute minimal animations
+
+Milestone:
+
+Study Buddy feels aesthetic, not like an admin panel
+
+Step 16: Progress Summaries
+
+Add weekly view:
+
+Tasks completed
+
+Pomodoro minutes
+
+Questions solved
+
+Milestone:
+
+User sees growth
+
+PHASE 5: Phase 2 Features (After MVP Works)
+Step 17: Google Calendar Integration
+
+Only after planner works.
+
+Add:
+
+Connect Google OAuth
+
+Sync study blocks
+
+Avoid overwriting user events
+
+Milestone:
+
+Calendar becomes a bonus, not a dependency
+
+Step 18: Revision Automation
+
+Add spaced repetition:
+
+Completed question → revision due in 3 days
+
+Auto-create revision tasks
+
+Milestone:
+
+App becomes smarter than a checklist
+
+PHASE 6: Deployment + Launch
+Step 19: Deploy MVP
+
+Deploy stack:
+
+Vercel frontend
+
+Supabase DB
+
+Clerk auth live
+
+Milestone:
+
+App usable by real users
+
+Step 20: Testing + Feedback
+
+Test with 5–10 students:
+
+Is planner helpful?
+
+Is UI calming?
+
+Does tracking feel easy?
+
+Fix pain points.
+
+Step 21: Public Launch
+
+Launch on:
+
+Product Hunt
+
+Twitter
+
+College communities
+
+Recommended Timeline (Realistic)
+
+Week 1: Docs + Auth + DB
+Week 2: Planner + Dashboard
+Week 3: Pomodoro + DSA Tracker
+Week 4: UI polish + Deployment
+Week 5: Calendar integration
