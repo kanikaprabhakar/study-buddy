@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Study Buddy Frontend
 
-## Getting Started
+Next.js App Router frontend with Clerk authentication and Supabase data sync.
 
-First, run the development server:
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Required environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env.local` in `frontend/` with:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
+CLERK_SECRET_KEY=...
+BACKEND_URL=http://localhost:4000
+BACKEND_INTERNAL_SYNC_SECRET=...
+```
 
-## Learn More
+## Clerk → Supabase user sync
 
-To learn more about Next.js, take a look at the following resources:
+User sync now runs in the backend service (Express), not in this frontend app.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Backend webhook endpoint:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `POST http://localhost:4000/api/webhooks/clerk`
 
-## Deploy on Vercel
+In Clerk Dashboard:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Go to **Webhooks**
+2. Add endpoint: `http://localhost:4000/api/webhooks/clerk`
+3. Subscribe to events:
+	- `user.created`
+	- `user.updated`
+	- `user.deleted`
+4. Copy signing secret into backend `.env` as `CLERK_WEBHOOK_SIGNING_SECRET`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Important schema note
+
+This project supports `users.id` as UUID by storing Clerk IDs in `users.clerk_id` (text, unique).

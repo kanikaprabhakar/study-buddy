@@ -28,7 +28,8 @@ Stores basic user profile info.
 
 | Column Name       | Type      | Notes |
 |------------------|----------|------|
-| id               | UUID     | Primary key (from Clerk) |
+| id               | UUID     | Primary key (generated in DB) |
+| clerk_id         | Text     | Unique Clerk user id (e.g. user_xxx) |
 | name             | Text     | Display name |
 | email            | Text     | Unique |
 | theme_preference | Text     | Light/pastel themes |
@@ -136,3 +137,30 @@ Stores Google Calendar integration metadata.
 - Clerk handles authentication; Supabase stores app-specific data  
 - DSA questions table is seeded once  
 - Revision scheduling can be computed later with spaced repetition logic  
+
+---
+
+## 5. Clerk Sync SQL (Required)
+
+Use UUID primary IDs plus `clerk_id` text for Clerk mapping.
+
+```sql
+create table if not exists public.users (
+	id uuid primary key default gen_random_uuid(),
+	clerk_id text unique,
+	name text,
+	email text unique,
+	theme_preference text,
+	streak_count integer default 0,
+	created_at timestamptz default now()
+);
+```
+
+If your table already exists:
+
+```sql
+create extension if not exists pgcrypto;
+alter table public.users add column if not exists clerk_id text;
+alter table public.users alter column id set default gen_random_uuid();
+create unique index if not exists users_clerk_id_key on public.users(clerk_id);
+```
