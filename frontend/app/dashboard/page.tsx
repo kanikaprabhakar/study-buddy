@@ -74,7 +74,24 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-violet-950 sm:text-3xl">
             Study Buddy
           </h1>
-          <UserButton afterSignOutUrl="/sign-in" />
+          <UserButton
+            afterSignOutUrl="/sign-in"
+            appearance={{
+              variables: {
+                colorPrimary: "#CB438B",
+                colorBackground: "#FFF0D2",
+                colorText: "#4D3449",
+                colorTextSecondary: "#6C6A43",
+                colorNeutral: "#4D3449",
+                borderRadius: "1rem",
+              },
+              elements: {
+                avatarBox: "ring-2 ring-[#CB438B] ring-offset-2 ring-offset-white",
+                userButtonPopoverCard: "border border-[rgba(203,67,139,0.25)] shadow-xl",
+                userButtonPopoverActions: "bg-[#FFF0D2]",
+              },
+            }}
+          />
         </header>
 
         <section className="grid gap-5 md:grid-cols-2">

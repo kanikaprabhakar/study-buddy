@@ -1,0 +1,46 @@
+/* ScrollStack — container */
+.scroll-stack-scroller {
+  position: relative;
+  width: 100%;
+}
+
+/* When useWindowScroll=false, this div is the actual scroll container */
+.scroll-stack-scroller:not([data-window-scroll]) {
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.scroll-stack-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+/* Each stacking card */
+.scroll-stack-card {
+  width: 100%;
+  max-width: 640px;
+  position: relative;
+  border-radius: 2rem;
+  /* GPU-composited — transform/filter only */
+  will-change: transform, filter;
+  transform-origin: top center;
+  backface-visibility: hidden;
+}
+
+/* Spacer that lets the last card's pin release */
+.scroll-stack-end {
+  height: 2px;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* Card inner background: transparent while scrolling, solid when pinned in stack */
+.card-bg-layer {
+  background: var(--card-bg-t, rgba(255,240,210,0.12));
+  transition: background 0.45s ease;
+}
+.scroll-stack-card[data-stacked="true"] .card-bg-layer {
+  background: var(--card-bg-s, #FFF0D2);
+}
