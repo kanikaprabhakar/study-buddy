@@ -6,13 +6,42 @@
   --mossy:     #6C6A43;
   --mulberry:  #4D3449;
   --pearl:     #FFF0D2;
-  --background: var(--pearl);
-  --foreground: var(--mulberry);
+
+  /* Semantic tokens — override in dark */
+  --fg-primary:   #4D3449;
+  --fg-secondary: #6C6A43;
+  --bg-page:      #FFF0D2;
+  --bg-grad-1:    #FFF0D2;
+  --bg-grad-2:    #FFDEC8;
+  --bg-grad-3:    #FFE8C0;
+  --bg-grad-4:    #FFF5DC;
+  --nav-glass:    rgba(255,240,210,0.82);
+  --nav-border:   rgba(203,67,139,0.30);
+  --shimmer-mid:  #FFF0D2;
+
+  --background: var(--bg-page);
+  --foreground: var(--fg-primary);
+}
+
+[data-theme="dark"] {
+  --fg-primary:   #FFE5D0;
+  --fg-secondary: #C9A595;
+  --bg-page:      #1C0B10;
+  --bg-grad-1:    #1C0B10;
+  --bg-grad-2:    #2A0E15;
+  --bg-grad-3:    #38101E;
+  --bg-grad-4:    #200B12;
+  --nav-glass:    rgba(28,11,16,0.88);
+  --nav-border:   rgba(203,67,139,0.45);
+  --shimmer-mid:  #2A0E15;
+
+  --background: var(--bg-page);
+  --foreground: var(--fg-primary);
 }
 
 @theme inline {
-  --color-background: var(--pearl);
-  --color-foreground: var(--mulberry);
+  --color-background: var(--bg-page);
+  --color-foreground: var(--fg-primary);
   --color-orchid:    #CB438B;
   --color-crimson:   #BF3556;
   --color-mossy:     #6C6A43;
@@ -24,10 +53,15 @@
 }
 
 body {
-  background: var(--pearl);
-  color: var(--mulberry);
+  background: var(--bg-page);
+  color: var(--fg-primary);
   font-family: var(--font-dm-sans), system-ui, sans-serif;
+  transition: background 0.4s ease, color 0.4s ease;
 }
+
+/* Semantic text utilities */
+.text-fg-primary   { color: var(--fg-primary); }
+.text-fg-secondary { color: var(--fg-secondary); }
 
 .font-display {
   font-family: var(--font-playfair), Georgia, "Times New Roman", serif;
@@ -40,9 +74,13 @@ body {
   100% { background-position: 0% 50%; }
 }
 .animate-gradient-bg {
-  background: linear-gradient(-45deg, #FFF0D2, #FFDEC8, #FFF0D2, #FFE8C0, #FFF5DC, #FFF0D2);
+  background: linear-gradient(-45deg,
+    var(--bg-grad-1), var(--bg-grad-2),
+    var(--bg-grad-1), var(--bg-grad-3),
+    var(--bg-grad-4), var(--bg-grad-1));
   background-size: 500% 500%;
   animation: gradient-drift 16s ease infinite;
+  transition: background 0.4s ease;
 }
 
 /* Fade up */
@@ -76,7 +114,7 @@ body {
   100% { background-position:  200% center; }
 }
 .animate-shimmer {
-  background: linear-gradient(90deg, #CB438B 20%, #FFF0D2 40%, #BF3556 60%, #CB438B 80%);
+  background: linear-gradient(90deg, #CB438B 20%, var(--shimmer-mid) 40%, #BF3556 60%, #CB438B 80%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

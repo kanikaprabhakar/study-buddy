@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTheme } from "@/lib/theme";
 
 export function ScrollNav() {
   const [show, setShow] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const onScroll = () => {
@@ -32,16 +35,22 @@ export function ScrollNav() {
       <header
         className="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border px-5 py-3 shadow-xl backdrop-blur-xl"
         style={{
-          background: "rgba(255,240,210,0.80)",
-          borderColor: "rgba(203,67,139,0.30)",
+          background: "var(--nav-glass)",
+          borderColor: "var(--nav-border)",
+          transition: "background 0.4s ease, border-color 0.4s ease",
         }}
       >
         {/* Brand */}
         <div className="flex items-center gap-2">
-          <Image src="/images/1.png" alt="Study Buddy" width={28} height={28} className="object-contain" />
+          <Image
+            src={theme === "dark" ? "/images/1.png" : "/images/5.png"}
+            alt="Study Buddy"
+            width={28}
+            height={28}
+            className="object-contain"
+          />
           <span
-            className="font-display text-lg font-bold italic"
-            style={{ color: "#4D3449" }}
+            className="font-display text-lg font-bold italic text-fg-primary"
           >
             Study Buddy
           </span>
@@ -50,6 +59,7 @@ export function ScrollNav() {
         {/* Clerk-aware buttons */}
         <SignedIn>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link
               href="/dashboard"
               className="rounded-xl px-4 py-2 text-sm font-bold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg"
@@ -82,6 +92,7 @@ export function ScrollNav() {
 
         <SignedOut>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link
               href="/sign-in"
               className="rounded-xl border px-4 py-2 text-sm font-bold transition-all duration-200 hover:scale-105"

@@ -1,8 +1,8 @@
 ﻿import Link from "next/link";
 import Image from "next/image";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { ScrollNav } from "@/components/landing/ScrollNav";
 import { ScrollCards } from "@/components/landing/ScrollCards";
+import { QuoteBanner } from "@/components/landing/QuoteBanner";
 
 export default function Home() {
   return (
@@ -25,7 +25,7 @@ export default function Home() {
 
           {/* Headline */}
           <div className="animate-fade-up">
-            <h2 className="font-display text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl lg:text-8xl" style={{ color: "#4D3449" }}>
+            <h2 className="font-display text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl lg:text-8xl text-fg-primary">
               Study
             </h2>
             <h2 className="font-display animate-shimmer text-6xl font-bold italic leading-[1.05] tracking-tight sm:text-7xl lg:text-8xl">
@@ -51,8 +51,7 @@ export default function Home() {
 
           {/* Sub copy */}
           <p
-            className="animate-fade-up delay-200 max-w-md text-base leading-relaxed sm:text-lg"
-            style={{ color: "#6C6A43" }}
+            className="animate-fade-up delay-200 max-w-md text-base leading-relaxed sm:text-lg text-fg-secondary"
           >
             Track daily missions, crush Pomodoro sessions, and watch your weekly wins stack up — all in your aesthetic study space.
           </p>
@@ -68,8 +67,8 @@ export default function Home() {
             </Link>
             <Link
               href="/sign-in"
-              className="rounded-2xl border-2 px-8 py-4 text-base font-bold transition-all duration-200 hover:scale-105"
-              style={{ borderColor: "#4D3449", color: "#4D3449" }}
+              className="rounded-2xl border-2 px-8 py-4 text-base font-bold transition-all duration-200 hover:scale-105 text-fg-primary"
+              style={{ borderColor: "var(--fg-primary)" }}
             >
               Sign In
             </Link>
@@ -78,7 +77,7 @@ export default function Home() {
           {/* Scroll hint */}
           <p
             className="animate-fade-up delay-500 text-[11px] font-bold uppercase tracking-[0.25em] animate-bounce-soft"
-            style={{ color: "#CB438B", opacity: 0.6 }}
+            style={{ color: "#CB438B", opacity: 0.7 }}
           >
             scroll to explore
           </p>
@@ -165,22 +164,7 @@ export default function Home() {
           <Image src="/images/12.png" alt="" fill className="object-contain" />
         </div>
 
-        <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.3em] text-white/60">
-          daily dose
-        </p>
-        <blockquote className="font-display text-2xl font-bold italic leading-snug text-white sm:text-4xl lg:text-5xl">
-          &ldquo;Small progress is still progress.&rdquo;
-        </blockquote>
-        <p className="mt-5 text-sm text-white/60">
-          Join students who study with style and actually show up.
-        </p>
-        <Link
-          href="/sign-up"
-          className="mt-8 inline-block rounded-2xl px-10 py-4 text-base font-bold shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl"
-          style={{ background: "#FFF0D2", color: "#BF3556" }}
-        >
-          Get Started Free
-        </Link>
+        <QuoteBanner />
       </section>
 
       {/* FOOTER */}

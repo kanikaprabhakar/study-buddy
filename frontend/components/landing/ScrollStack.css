@@ -36,11 +36,46 @@
   pointer-events: none;
 }
 
-/* Card inner background: transparent while scrolling, solid when pinned in stack */
+/* Card background: transparent while scrolling, theme-aware when pinned in stack */
 .card-bg-layer {
   background: var(--card-bg-t, rgba(255,240,210,0.12));
-  transition: background 0.45s ease;
+  backdrop-filter: blur(8px);
+  transition: background 0.4s ease;
 }
+
+/* Light mode stacked: soft pearl glass that blends with the warm background */
 .scroll-stack-card[data-stacked="true"] .card-bg-layer {
-  background: var(--card-bg-s, #FFF0D2);
+  background: rgba(255, 240, 210, 0.90);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 4px 32px rgba(203,67,139,0.08);
+}
+
+/* Dark mode stacked: deep maroon glass that blends with the dark background */
+[data-theme="dark"] .scroll-stack-card[data-stacked="true"] .card-bg-layer {
+  background: rgba(38, 12, 22, 0.88);
+  backdrop-filter: blur(16px);
+  box-shadow: none;
+}
+
+/* Card title: always fg-primary (adapts via CSS var in both modes) */
+.card-title {
+  color: var(--fg-primary);
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+/* Dark mode stacked: pearl text with subtle glow */
+[data-theme="dark"] .scroll-stack-card[data-stacked="true"] .card-title {
+  color: #FFE5D0;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.30);
+}
+
+/* Card body: always fg-secondary */
+.card-body {
+  color: var(--fg-secondary);
+  transition: color 0.4s ease;
+}
+
+/* Dark mode stacked: muted pearl */
+[data-theme="dark"] .scroll-stack-card[data-stacked="true"] .card-body {
+  color: rgba(255,229,208,0.72);
 }

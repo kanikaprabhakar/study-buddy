@@ -8,8 +8,7 @@ const CARDS = [
     img: "/images/2.png",
     title: "Daily Planner",
     body: "Set your study intentions every morning. Goals feel lighter when written down.",
-    bgT: "rgba(203,67,139,0.12)",
-    bgS: "#F7DEED",
+    bgT: "rgba(203,67,139,0.13)",
     border: "rgba(203,67,139,0.35)",
     accent: "#CB438B",
     tag: "plan",
@@ -18,8 +17,7 @@ const CARDS = [
     img: "/images/3.png",
     title: "Pomodoro Timer",
     body: "25 min focus, 5 min break. Lock in, reward yourself, repeat.",
-    bgT: "rgba(191,53,86,0.12)",
-    bgS: "#F9DEEB",
+    bgT: "rgba(191,53,86,0.13)",
     border: "rgba(191,53,86,0.35)",
     accent: "#BF3556",
     tag: "focus",
@@ -28,8 +26,7 @@ const CARDS = [
     img: "/images/4.png",
     title: "Progress Tracker",
     body: "Visual bars, weekly streaks. Watch your consistency compound beautifully.",
-    bgT: "rgba(108,106,67,0.10)",
-    bgS: "#EEEEE6",
+    bgT: "rgba(108,106,67,0.11)",
     border: "rgba(108,106,67,0.32)",
     accent: "#6C6A43",
     tag: "track",
@@ -38,8 +35,7 @@ const CARDS = [
     img: "/images/5.png",
     title: "Daily Motivation",
     body: "A fresh quote every day to keep your head in the game and your vibe right.",
-    bgT: "rgba(77,52,73,0.10)",
-    bgS: "#ECE9ED",
+    bgT: "rgba(77,52,73,0.11)",
     border: "rgba(77,52,73,0.28)",
     accent: "#4D3449",
     tag: "inspire",
@@ -49,7 +45,6 @@ const CARDS = [
     title: "Aesthetic Space",
     body: "Because your study environment matters. Soft, focused, and made for you.",
     bgT: "rgba(203,67,139,0.10)",
-    bgS: "#F7DEED",
     border: "rgba(203,67,139,0.28)",
     accent: "#CB438B",
     tag: "vibe",
@@ -59,7 +54,6 @@ const CARDS = [
     title: "Backend Sync",
     body: "Data saved securely. Show up on any device, pick up right where you left off.",
     bgT: "rgba(191,53,86,0.10)",
-    bgS: "#F9DEEB",
     border: "rgba(191,53,86,0.28)",
     accent: "#BF3556",
     tag: "sync",
@@ -78,8 +72,7 @@ export function ScrollCards() {
           everything you need
         </p>
         <h2
-          className="font-display text-3xl font-bold sm:text-4xl"
-          style={{ color: "#4D3449" }}
+          className="font-display text-3xl font-bold sm:text-4xl text-fg-primary"
         >
           Built for your best self.
         </h2>
@@ -95,12 +88,11 @@ export function ScrollCards() {
         baseScale={0.88}
         blurAmount={0.6}
       >
-        {CARDS.map(({ img, title, body, bgT, bgS, border, accent, tag }) => (
+        {CARDS.map(({ img, title, body, bgT, border, accent, tag }) => (
           <ScrollStackItem
             key={title}
             style={{
               ["--card-bg-t" as string]: bgT,
-              ["--card-bg-s" as string]: bgS,
             }}
           >
             <div
@@ -129,15 +121,12 @@ export function ScrollCards() {
               </div>
 
               {/* Title */}
-              <h3
-                className="font-display mb-3 text-2xl font-bold sm:text-3xl"
-                style={{ color: "#4D3449" }}
-              >
+              <h3 className="card-title font-display mb-3 text-2xl font-bold sm:text-3xl">
                 {title}
               </h3>
 
               {/* Body */}
-              <p className="text-base leading-relaxed" style={{ color: "#6C6A43" }}>
+              <p className="card-body text-base leading-relaxed">
                 {body}
               </p>
 
