@@ -44,12 +44,12 @@ function clerkAppearance(dark: boolean) {
 }
 
 const FLOATERS = [
-  { src: "/images/9.png",  w: 48, top: "8%",   left: "6%",   anim: "animate-float-slow",   delay: "0s" },
-  { src: "/images/10.png", w: 40, top: "12%",  right: "8%",  anim: "animate-float-medium", delay: "1.2s" },
-  { src: "/images/11.png", w: 36, bottom: "18%", left: "5%", anim: "animate-float-fast",   delay: "0.6s" },
-  { src: "/images/12.png", w: 44, bottom: "10%", right: "6%",anim: "animate-float-slow",   delay: "1.8s" },
-  { src: "/images/9.png",  w: 30, top: "42%",  left: "2%",   anim: "animate-float-medium", delay: "2.1s" },
-  { src: "/images/10.png", w: 32, top: "58%",  right: "3%",  anim: "animate-float-fast",   delay: "0.3s" },
+  { src: "/images/20.png", w: 110, top: "5%",     left: "3%",   anim: "animate-float-slow",   delay: "0s" },
+  { src: "/images/23.png", w: 95,  top: "10%",    right: "4%",  anim: "animate-float-medium", delay: "1.2s" },
+  { src: "/images/11.png", w: 85,  bottom: "22%", left: "2%",   anim: "animate-float-fast",   delay: "0.6s" },
+  { src: "/images/16.png", w: 100, bottom: "8%",  right: "3%",  anim: "animate-float-slow",   delay: "1.8s" },
+  { src: "/images/9.png",  w: 80,  top: "45%",    left: "0%",   anim: "animate-float-medium", delay: "2.1s" },
+  { src: "/images/13.png", w: 90,  top: "60%",    right: "1%",  anim: "animate-float-fast",   delay: "0.3s" },
 ] as const;
 
 
@@ -79,7 +79,7 @@ export default function SignInPage() {
             left: (f as any).left,
             right: (f as any).right,
             animationDelay: f.delay,
-            opacity: 0.5,
+            opacity: 0.75,
             zIndex: 1,
           }}
         >
@@ -100,12 +100,12 @@ export default function SignInPage() {
         >
           <Image
             src={dark ? "/images/1.png" : "/images/5.png"}
-            alt="Study Buddy"
+            alt="Zenith"
             width={20}
             height={20}
             className="object-contain"
           />
-          Study Buddy
+          Zenith
         </Link>
         <ThemeToggle />
       </div>

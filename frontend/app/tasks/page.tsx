@@ -18,10 +18,12 @@ import {
 } from "@/lib/tasks";
 
 const FLOATERS = [
-  { src: "/images/11.png", w: 38, top: "5%",    left: "2%",   anim: "animate-float-slow",   delay: "0s" },
-  { src: "/images/9.png",  w: 30, top: "20%",   right: "3%",  anim: "animate-float-medium", delay: "1.4s" },
-  { src: "/images/12.png", w: 34, bottom: "20%", left: "1%",  anim: "animate-float-fast",   delay: "0.8s" },
-  { src: "/images/10.png", w: 28, bottom: "6%",  right: "2%", anim: "animate-float-slow",   delay: "2.0s" },
+  { src: "/images/14.png", w: 100, top: "3%",    left: "0%",   anim: "animate-float-slow",   delay: "0s" },
+  { src: "/images/18.png", w: 90,  top: "15%",   right: "0%",  anim: "animate-float-medium", delay: "1.4s" },
+  { src: "/images/12.png", w: 80,  top: "45%",   left: "0%",   anim: "animate-float-fast",   delay: "0.8s" },
+  { src: "/images/21.png", w: 95,  top: "60%",   right: "0%",  anim: "animate-float-slow",   delay: "2.0s" },
+  { src: "/images/10.png", w: 75,  bottom: "15%",left: "1%",   anim: "animate-float-medium", delay: "1.1s" },
+  { src: "/images/24.png", w: 88,  bottom: "4%", right: "1%",  anim: "animate-float-fast",   delay: "0.5s" },
 ] as const;
 
 const PRIORITIES: Priority[] = ["high", "medium", "low"];
@@ -143,7 +145,7 @@ export default function TasksPage() {
 
       {FLOATERS.map((f, i) => (
         <span key={i} aria-hidden className={`pointer-events-none fixed ${f.anim}`}
-          style={{ top: (f as any).top, bottom: (f as any).bottom, left: (f as any).left, right: (f as any).right, animationDelay: f.delay, opacity: 0.4, zIndex: 1 }}>
+          style={{ top: (f as any).top, bottom: (f as any).bottom, left: (f as any).left, right: (f as any).right, animationDelay: f.delay, opacity: 0.7, zIndex: 1 }}>
           <Image src={f.src} alt="" width={f.w} height={f.w} className="object-contain" />
         </span>
       ))}

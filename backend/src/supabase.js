@@ -12,6 +12,9 @@ if (connectionString.includes('[YOUR-PASSWORD]')) {
 
 const sql = postgres(connectionString, {
 	ssl: 'require',
+	idle_timeout: 20,
+	max_lifetime: 1800,
+	connect_timeout: 30,
 })
 
 export default sql

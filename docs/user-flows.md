@@ -1,12 +1,12 @@
 # User Flows and Use Cases
 
-This document describes how users interact with Study Buddy.
+This document describes how users interact with Zenith.
 
 ---
 
 ## Flow 1: Sign Up and Dashboard Entry
 
-1. User opens Study Buddy  
+1. User opens Zenith  
 2. User signs up using Clerk  
 3. User is redirected to dashboard  
 4. Dashboard shows weekly planner + focus tools  
@@ -68,6 +68,6 @@ This document describes how users interact with Study Buddy.
 ## Flow 7 (Phase 2): Google Calendar Sync
 
 1. User connects Google Calendar  
-2. Study Buddy reads weekly events  
+2. Zenith reads weekly events  
 3. Study sessions are added as calendar blocks  
 4. Sync does not overwrite personal events  

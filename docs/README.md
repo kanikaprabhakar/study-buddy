@@ -1,6 +1,6 @@
-# Study Buddy Documentation
+# Zenith Documentation
 
-This folder contains the core planning documents for the Study Buddy project.
+This folder contains the core planning documents for the Zenith project.
 
 ## Documents
 

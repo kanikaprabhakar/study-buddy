@@ -44,12 +44,12 @@ function clerkAppearance(dark: boolean) {
 }
 
 const FLOATERS = [
-  { src: "/images/11.png", w: 48, top: "7%",    left: "7%",   anim: "animate-float-medium", delay: "0.4s" },
-  { src: "/images/12.png", w: 42, top: "14%",   right: "7%",  anim: "animate-float-slow",   delay: "1.5s" },
-  { src: "/images/9.png",  w: 36, bottom: "20%", left: "4%",  anim: "animate-float-fast",   delay: "0.9s" },
-  { src: "/images/10.png", w: 44, bottom: "8%",  right: "5%", anim: "animate-float-medium", delay: "2.0s" },
-  { src: "/images/12.png", w: 30, top: "45%",   left: "1%",   anim: "animate-float-slow",   delay: "1.0s" },
-  { src: "/images/11.png", w: 34, top: "60%",   right: "2%",  anim: "animate-float-fast",   delay: "0.2s" },
+  { src: "/images/15.png", w: 105, top: "6%",     left: "4%",   anim: "animate-float-medium", delay: "0.4s" },
+  { src: "/images/19.png", w: 90,  top: "12%",    right: "3%",  anim: "animate-float-slow",   delay: "1.5s" },
+  { src: "/images/22.png", w: 88,  bottom: "22%", left: "2%",   anim: "animate-float-fast",   delay: "0.9s" },
+  { src: "/images/12.png", w: 100, bottom: "6%",  right: "2%",  anim: "animate-float-medium", delay: "2.0s" },
+  { src: "/images/24.png", w: 80,  top: "42%",    left: "0%",   anim: "animate-float-slow",   delay: "1.0s" },
+  { src: "/images/14.png", w: 92,  top: "58%",    right: "0%",  anim: "animate-float-fast",   delay: "0.2s" },
 ] as const;
 
 
@@ -79,7 +79,7 @@ export default function SignUpPage() {
             left: (f as any).left,
             right: (f as any).right,
             animationDelay: f.delay,
-            opacity: 0.5,
+            opacity: 0.75,
             zIndex: 1,
           }}
         >
@@ -100,12 +100,12 @@ export default function SignUpPage() {
         >
           <Image
             src={dark ? "/images/1.png" : "/images/5.png"}
-            alt="Study Buddy"
+            alt="Zenith"
             width={20}
             height={20}
             className="object-contain"
           />
-          Study Buddy
+          Zenith
         </Link>
         <ThemeToggle />
       </div>

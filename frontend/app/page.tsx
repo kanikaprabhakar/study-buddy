@@ -172,7 +172,7 @@ export default function Home() {
         className="relative z-10 pb-10 text-center text-xs"
         style={{ color: "#6C6A43" }}
       >
-        Study Buddy &mdash; built with love for students who show up every day
+        Zenith &mdash; built with love for students who show up every day
       </footer>
     </main>
   );

@@ -1,6 +1,6 @@
 # Software Requirements Specification (SRS)
 
-Project: Study Buddy  
+Project: Zenith  
 Version: 1.0
 
 ---
@@ -9,7 +9,7 @@ Version: 1.0
 
 ### 1.1 Purpose
 
-This document describes the requirements for Study Buddy, an aesthetic study planner app that combines scheduling, Pomodoro focus tools, motivation features, and DSA tracking in one place.
+This document describes the requirements for Zenith, an aesthetic study planner app that combines scheduling, Pomodoro focus tools, motivation features, and DSA tracking in one place.
 
 The goal is to clearly define what the app should do before development begins.
 
@@ -17,7 +17,7 @@ The goal is to clearly define what the app should do before development begins.
 
 ### 1.2 Scope
 
-Study Buddy is a web application that helps students and self-learners:
+Zenith is a web application that helps students and self-learners:
 
 - Plan weekly study routines  
 - Sync schedules with Google Calendar  
@@ -42,7 +42,7 @@ The app focuses on being simple, guided, and visually calming rather than comple
 
 ### 2.1 Product Overview
 
-Study Buddy provides an all-in-one productivity system where users can log in, connect their calendar, and immediately start following a structured weekly plan.
+Zenith provides an all-in-one productivity system where users can log in, connect their calendar, and immediately start following a structured weekly plan.
 
 Core modules include:
 
@@ -88,7 +88,7 @@ The dashboard must display:
 ### 3.3 Google Calendar Integration
 
 - Users can connect their Google Calendar account  
-- The system can display calendar events inside Study Buddy  
+- The system can display calendar events inside Zenith  
 - The system can add study sessions as calendar blocks  
 - Sync must not overwrite existing user events  
 

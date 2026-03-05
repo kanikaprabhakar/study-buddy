@@ -1,12 +1,12 @@
 # Database Schema Design
 
-Study Buddy (Supabase Postgres)
+Zenith (Supabase Postgres)
 
 ---
 
 ## 1. Overview
 
-This schema supports the core Study Buddy features:
+This schema supports the core Zenith features:
 
 - User profiles  
 - Study planning  

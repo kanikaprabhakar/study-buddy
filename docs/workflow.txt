@@ -1,4 +1,4 @@
-Study Buddy Project Workflow (Step-by-Step)
+Zenith Project Workflow (Step-by-Step)
 
 This is the full professional development flow, but in a simple builder-friendly way.
 
@@ -7,7 +7,7 @@ Step 1: Lock the Core Idea
 
 Write the one-liner:
 
-Study Buddy is an aesthetic study planner app with built-in scheduling, Pomodoro focus, DSA tracking, and motivation.
+Zenith is an aesthetic study planner app with built-in scheduling, Pomodoro focus, DSA tracking, and motivation.
 
 Do not expand scope yet.
 
@@ -54,7 +54,7 @@ Deployment: Vercel
 
 Step 5: Plan the App Modules
 
-Break Study Buddy into clear modules:
+Break Zenith into clear modules:
 
 Auth Module
 
@@ -209,7 +209,7 @@ Cute minimal animations
 
 Milestone:
 
-Study Buddy feels aesthetic, not like an admin panel
+Zenith feels aesthetic, not like an admin panel
 
 Step 16: Progress Summaries
 

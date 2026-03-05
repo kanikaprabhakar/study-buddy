@@ -7,7 +7,7 @@ const Header = () => {
             SB
           </div>
           <span className="font-semibold text-foreground text-lg tracking-tight font-serif">
-            Study Buddy
+            Zenith
           </span>
         </div>
 

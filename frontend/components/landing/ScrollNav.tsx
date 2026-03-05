@@ -44,7 +44,7 @@ export function ScrollNav() {
         <div className="flex items-center gap-2">
           <Image
             src={theme === "dark" ? "/images/1.png" : "/images/5.png"}
-            alt="Study Buddy"
+            alt="Zenith"
             width={28}
             height={28}
             className="object-contain"
@@ -52,7 +52,7 @@ export function ScrollNav() {
           <span
             className="font-display text-lg font-bold italic text-fg-primary"
           >
-            Study Buddy
+            Zenith
           </span>
         </div>
 

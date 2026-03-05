@@ -26,7 +26,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Study Buddy",
+  title: "Zenith",
   description: "Your aesthetic all-in-one study planner",
   icons: {
     icon: "/images/8.png",

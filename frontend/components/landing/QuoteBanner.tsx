@@ -7,7 +7,7 @@ import type { Quote } from "@/lib/quoterism";
 const FALLBACK: Quote = {
   id: "fallback",
   text: "Small progress is still progress.",
-  author: { id: "fallback", name: "Study Buddy" },
+  author: { id: "fallback", name: "Zenith" },
 };
 
 type State =

@@ -18,15 +18,15 @@ export async function POST() {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "Study Buddy <onboarding@resend.dev>",
+      from: "Zenith <onboarding@resend.dev>",
       to: [email],
-      subject: "Welcome to Study Buddy ✨",
+      subject: "Welcome to Zenith ✨",
       html: `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Study Buddy</title>
+  <title>Welcome to Zenith</title>
 </head>
 <body style="margin:0;padding:0;background:#1C0B10;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#1C0B10;padding:40px 16px;">
@@ -43,7 +43,7 @@ export async function POST() {
           <tr>
             <td align="center" style="padding:36px 36px 0;">
               <p style="margin:0;font-size:28px;font-weight:800;font-style:italic;color:#FFE5D0;letter-spacing:-0.5px;">
-                Study Buddy ✨
+                Zenith ✨
               </p>
             </td>
           </tr>
@@ -64,7 +64,7 @@ export async function POST() {
           <tr>
             <td style="padding:24px 36px;">
               <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#C9A595;">
-                We're so glad you're here. Study Buddy is built for girls who grind — 
+                We're so glad you're here. Zenith is built for girls who grind — 
                 a space to track your tasks, crush Pomodoro sessions, and watch your weekly wins stack up.
               </p>
               <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#C9A595;">
@@ -110,7 +110,7 @@ export async function POST() {
           <tr>
             <td style="padding:20px 36px;border-top:1px solid rgba(203,67,139,0.15);">
               <p style="margin:0;font-size:12px;color:rgba(201,165,149,0.55);text-align:center;line-height:1.6;">
-                You're receiving this because you just signed up for Study Buddy.<br/>
+                You're receiving this because you just signed up for Zenith.<br/>
                 Made with 💕 for girlies who grind.
               </p>
             </td>

@@ -21,7 +21,7 @@ async function upsertClerkUser(user) {
 		null;
 
 	const fullName = `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim();
-	const displayName = fullName || user.username || "Study Buddy User";
+	const displayName = fullName || user.username || "Zenith User";
 
 	if (primaryEmail) {
 		await sql`
@@ -100,7 +100,7 @@ async function ensureTasksSchema() {
 app.use(cors());
 
 app.get("/health", (_req, res) => {
-	res.status(200).json({ ok: true, service: "study-buddy-backend" });
+	res.status(200).json({ ok: true, service: "zenith-backend" });
 });
 
 app.post("/api/internal/sync-user", express.json(), async (req, res) => {
@@ -267,7 +267,7 @@ app.delete("/api/tasks/:id", async (req, res) => {
 Promise.all([ensureUsersSchema(), ensureTasksSchema()])
 	.then(() => {
 		app.listen(port, () => {
-			console.log(`Study Buddy backend running on http://localhost:${port}`);
+			console.log(`Zenith backend running on http://localhost:${port}`);
 		});
 	})
 	.catch((error) => {
@@ -277,6 +277,6 @@ Promise.all([ensureUsersSchema(), ensureTasksSchema()])
 		);
 
 		app.listen(port, () => {
-			console.log(`Study Buddy backend running on http://localhost:${port}`);
+			console.log(`Zenith backend running on http://localhost:${port}`);
 		});
 	});

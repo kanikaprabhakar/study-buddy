@@ -1,4 +1,4 @@
-# Study Buddy Development Roadmap
+# Zenith Development Roadmap
 
 This roadmap defines the correct build order for the MVP.
 
