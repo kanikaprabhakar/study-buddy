@@ -15,6 +15,8 @@ import {
   apiDeleteTask,
   sortTasks,
   PRIORITY_META,
+  fetchGCalStatus,
+  apiGCalAddEvent,
 } from "@/lib/tasks";
 
 const FLOATERS = [
@@ -30,6 +32,11 @@ const PRIORITIES: Priority[] = ["high", "medium", "low"];
 
 const EMPTY_FORM = { title: "", deadline: "", priority: "medium" as Priority };
 
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export default function TasksPage() {
   const { theme } = useTheme();
   const dark = theme === "dark";
@@ -41,6 +48,9 @@ export default function TasksPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "active" | "done">("all");
+  const [gcalConnected, setGcalConnected] = useState(false);
+  const [addedToCalIds, setAddedToCalIds] = useState<Set<string>>(new Set());
+  const [toast, setToast]         = useState<string | null>(null);
 
   // Load tasks from API on mount
   useEffect(() => {
@@ -51,6 +61,7 @@ export default function TasksPage() {
         .then((t) => { if (!cancelled) setTasks(t); })
         .catch(() => {})
         .finally(() => { if (!cancelled) setLoading(false); });
+      fetchGCalStatus(token).then(({ connected }) => { if (!cancelled) setGcalConnected(connected); }).catch(() => {});
     });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,7 +102,10 @@ export default function TasksPage() {
     try {
       const token = await getToken();
       if (!token) throw new Error("no token");
-      const updated = await apiPatchTask(token, task.id, { done: !task.done });
+      const updated = await apiPatchTask(token, task.id, {
+        done: !task.done,
+        ...(!task.done ? { completed_on: todayISO() } : {}),
+      });
       setTasks((prev) => prev.map((t) => t.id === task.id ? updated : t));
     } catch {
       // revert
@@ -362,6 +376,27 @@ export default function TasksPage() {
 
                   {/* Actions */}
                   <div className="flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* Add to Google Calendar — only for tasks with a deadline */}
+                    {gcalConnected && task.deadline && !task.done && (
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          const token = await getToken();
+                          if (!token) return;
+                          const result = await apiGCalAddEvent(token, { title: task.title, deadline: task.deadline! });
+                          if (result) {
+                            setAddedToCalIds((prev) => new Set([...prev, task.id]));
+                            setToast(`“${task.title}” added to Google Calendar ✓`);
+                            setTimeout(() => setToast(null), 4000);
+                          }
+                        }}
+                        title="Add to Google Calendar"
+                        aria-label="Add to Google Calendar"
+                        className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110"
+                        style={{ background: dark ? "rgba(66,133,244,0.15)" : "rgba(66,133,244,0.10)", color: addedToCalIds.has(task.id) ? "#4ade80" : "#4285F4" }}>
+                        {addedToCalIds.has(task.id) ? "✓ Cal" : "📅"}
+                      </button>
+                    )}
                     <button onClick={() => startEdit(task)} aria-label="Edit"
                       className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110"
                       style={{ background: dark ? "rgba(203,67,139,0.15)" : "rgba(203,67,139,0.10)", color: "#CB438B" }}>
@@ -380,6 +415,18 @@ export default function TasksPage() {
         )}
         </>)}
       </div>
+
+      {/* Add to Calendar success toast */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[999] flex items-center gap-3 rounded-2xl border px-5 py-3.5 shadow-2xl backdrop-blur-xl animate-fade-up"
+          style={{ background: dark ? "rgba(28,11,16,0.96)" : "rgba(255,248,238,0.96)", borderColor: "rgba(66,133,244,0.45)", maxWidth: 360 }}>
+          <span className="text-lg">&#x1F4C5;</span>
+          <p className="flex-1 text-sm font-semibold" style={{ color: "var(--fg-primary)" }}>{toast}</p>
+          <button onClick={() => setToast(null)}
+            className="text-lg leading-none opacity-60 hover:opacity-100 transition-opacity"
+            style={{ color: "var(--fg-secondary)" }}>&#x00D7;</button>
+        </div>
+      )}
     </main>
   );
 }

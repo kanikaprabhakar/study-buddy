@@ -7,6 +7,7 @@ export interface Task {
   priority: Priority;
   done: boolean;
   createdAt: string;
+  completedOn?: string; // date task was marked done (YYYY-MM-DD)
 }
 
 /* ── pure helpers (no network, no side-effects) ── */
@@ -66,7 +67,7 @@ export async function apiCreateTask(
 export async function apiPatchTask(
   token: string,
   id: string,
-  patch: Partial<Pick<Task, "title" | "deadline" | "priority" | "done">>,
+  patch: Partial<Pick<Task, "title" | "deadline" | "priority" | "done">> & { completed_on?: string },
 ): Promise<Task> {
   const res = await fetch(`${BASE}/api/tasks/${id}`, {
     method: "PATCH",
@@ -110,14 +111,149 @@ export async function fetchWeekStudyDays(token: string, from?: string): Promise<
   return res.json() as Promise<string[]>;
 }
 
+/* ── Day summary ── */
+
+export interface DaySummaryTask {
+  id: string;
+  title: string;
+  priority: Priority;
+}
+
+export interface DaySummarySession {
+  id: string;
+  durationMin: number;
+  mode: string;
+}
+
+export interface DaySummary {
+  tasks: DaySummaryTask[];
+  sessions: DaySummarySession[];
+}
+
+export async function fetchDaySummary(token: string, date: string): Promise<DaySummary> {
+  const res = await fetch(`${BASE}/api/day-summary?date=${encodeURIComponent(date)}`, { headers: headers(token) });
+  if (!res.ok) return { tasks: [], sessions: [] };
+  return res.json() as Promise<DaySummary>;
+}
+
 /* ── internal normaliser ── */
 function normaliseRow(row: Record<string, unknown>): Task {
   return {
-    id:        String(row.id),
-    title:     String(row.title),
-    deadline:  row.deadline ? String(row.deadline).slice(0, 10) : undefined,
-    priority:  (row.priority as Priority) ?? "medium",
-    done:      Boolean(row.done),
-    createdAt: String(row.createdAt ?? row.created_at ?? new Date().toISOString()),
+    id:          String(row.id),
+    title:       String(row.title),
+    deadline:    row.deadline    ? String(row.deadline).slice(0, 10)    : undefined,
+    priority:    (row.priority as Priority) ?? "medium",
+    done:        Boolean(row.done),
+    createdAt:   String(row.createdAt ?? row.created_at ?? new Date().toISOString()),
+    completedOn: row.completedOn ? String(row.completedOn).slice(0, 10) : undefined,
   };
+}
+
+/* ── Resources (bookmarks) ── */
+
+export interface Resource {
+  id: string;
+  name: string;
+  url: string;
+  description?: string;
+  createdAt: string;
+}
+
+function normaliseResource(row: Record<string, unknown>): Resource {
+  return {
+    id:          String(row.id),
+    name:        String(row.name),
+    url:         String(row.url),
+    description: row.description ? String(row.description) : undefined,
+    createdAt:   String(row.createdAt ?? row.created_at ?? new Date().toISOString()),
+  };
+}
+
+export async function fetchResources(token: string): Promise<Resource[]> {
+  const res = await fetch(`${BASE}/api/resources`, { headers: headers(token) });
+  if (!res.ok) throw new Error(`fetchResources: ${res.status}`);
+  const rows = await res.json() as Array<Record<string, unknown>>;
+  return rows.map(normaliseResource);
+}
+
+export async function apiCreateResource(
+  token: string,
+  data: { name: string; url: string; description?: string },
+): Promise<Resource> {
+  const res = await fetch(`${BASE}/api/resources`, {
+    method: "POST",
+    headers: headers(token),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`apiCreateResource: ${res.status}`);
+  return normaliseResource(await res.json() as Record<string, unknown>);
+}
+
+export async function apiPatchResource(
+  token: string,
+  id: string,
+  patch: Partial<{ name: string; url: string; description: string }>,
+): Promise<Resource> {
+  const res = await fetch(`${BASE}/api/resources/${id}`, {
+    method: "PATCH",
+    headers: headers(token),
+    body: JSON.stringify(patch),
+  });
+  if (!res.ok) throw new Error(`apiPatchResource: ${res.status}`);
+  return normaliseResource(await res.json() as Record<string, unknown>);
+}
+
+export async function apiDeleteResource(token: string, id: string): Promise<void> {
+  const res = await fetch(`${BASE}/api/resources/${id}`, {
+    method: "DELETE",
+    headers: headers(token),
+  });
+  if (!res.ok && res.status !== 204) throw new Error(`apiDeleteResource: ${res.status}`);
+}
+
+/* ── Google Calendar ── */
+
+export interface GCalEvent {
+  id: string;
+  title: string;
+  start: string | null;
+  isAllDay: boolean;
+  link: string | null;
+}
+
+export async function fetchGCalStatus(token: string): Promise<{ connected: boolean; gcalEmail?: string }> {
+  const res = await fetch(`${BASE}/api/gcal/status`, { headers: headers(token) });
+  if (!res.ok) return { connected: false };
+  const j = await res.json() as { connected: boolean; gcalEmail?: string | null };
+  return { connected: j.connected, gcalEmail: j.gcalEmail ?? undefined };
+}
+
+export async function fetchGCalAuthUrl(token: string): Promise<string | null> {
+  const res = await fetch(`${BASE}/api/gcal/auth-url`, { headers: headers(token) });
+  if (!res.ok) return null;
+  const j = await res.json() as { url?: string };
+  return j.url ?? null;
+}
+
+export async function fetchGCalEvents(token: string, days = 7): Promise<GCalEvent[]> {
+  const res = await fetch(`${BASE}/api/gcal/events?days=${days}`, { headers: headers(token) });
+  if (!res.ok) return [];
+  return res.json() as Promise<GCalEvent[]>;
+}
+
+export async function apiGCalDisconnect(token: string): Promise<void> {
+  await fetch(`${BASE}/api/gcal/disconnect`, { method: "DELETE", headers: headers(token) });
+}
+
+export async function apiGCalAddEvent(
+  token: string,
+  data: { title: string; deadline: string; description?: string },
+): Promise<{ id: string; link: string } | null> {
+  const res = await fetch(`${BASE}/api/gcal/add-event`, {
+    method: "POST",
+    headers: headers(token),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) return null;
+  return res.json() as Promise<{ id: string; link: string }>;
 }
