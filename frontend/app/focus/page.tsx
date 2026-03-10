@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { useTheme } from "@/lib/theme";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { fetchTasks, apiPatchTask, apiCreateTask, sortTasks, PRIORITY_META, type Task } from "@/lib/tasks";
+import { fetchTasks, apiPatchTask, apiCreateTask, apiLogSession, sortTasks, PRIORITY_META, type Task } from "@/lib/tasks";
 
 /* ── Background images ── */
 const BACKGROUNDS = [
@@ -69,6 +69,52 @@ interface QuickTask { id: string; title: string; done: boolean }
 
 /* ── LocalStorage key ── */
 const STORAGE_KEY = "sb_focus_timer";
+const STUDY_DAYS_KEY = "zenith_study_days";
+const FIRST_SESSION_KEY = "zenith_first_session_toast";
+const FIRST_SESSION_START_KEY = "zenith_first_session_start";
+
+/** Local-timezone YYYY-MM-DD — avoids UTC offset shifting the date */
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** Mark today as a study day in localStorage */
+function markStudyDay() {
+  try {
+    const today = todayISO();
+    const raw = localStorage.getItem(STUDY_DAYS_KEY);
+    const days: string[] = raw ? JSON.parse(raw) : [];
+    if (!days.includes(today)) {
+      days.push(today);
+      // only keep last 30 days
+      const trimmed = days.slice(-30);
+      localStorage.setItem(STUDY_DAYS_KEY, JSON.stringify(trimmed));
+    }
+  } catch {}
+}
+
+/** Returns true if this is the first focus session completed today */
+function isFirstSessionToday(): boolean {
+  try {
+    const today = todayISO();
+    const last = localStorage.getItem(FIRST_SESSION_KEY);
+    if (last === today) return false;
+    localStorage.setItem(FIRST_SESSION_KEY, today);
+    return true;
+  } catch { return false; }
+}
+
+/** Returns true if this is the first time a session is STARTED today */
+function isFirstSessionStartToday(): boolean {
+  try {
+    const today = todayISO();
+    const last = localStorage.getItem(FIRST_SESSION_START_KEY);
+    if (last === today) return false;
+    localStorage.setItem(FIRST_SESSION_START_KEY, today);
+    return true;
+  } catch { return false; }
+}
 
 export default function FocusPage() {
   const { theme } = useTheme();
@@ -171,39 +217,131 @@ export default function FocusPage() {
     if (pipWindowRef.current) return;
     try {
       const pipWin: any = await (window as any).documentPictureInPicture.requestWindow({
-        width: 280,
-        height: 200,
+        width: 300,
+        height: 240,
       });
 
+      // Base styles
+      // Inject Playfair Display so PiP timer matches the main focus page font
+      pipWin.document.head.innerHTML =
+        '<link rel="preconnect" href="https://fonts.googleapis.com">' +
+        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+        '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">';
       pipWin.document.body.style.cssText =
-        "margin:0;padding:0;background:linear-gradient(135deg,#14060c 0%,#1e0814 100%);" +
-        "display:flex;flex-direction:column;align-items:center;justify-content:center;" +
-        "gap:10px;font-family:system-ui,sans-serif;height:100vh;overflow:hidden;";
+        "margin:0;padding:0;overflow:hidden;font-family:'Playfair Display',Georgia,serif;";
 
-      const modeEl = pipWin.document.createElement("div");
-      modeEl.id = "pip-mode";
-      modeEl.style.cssText =
-        "color:#CB438B;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.2em;";
-      modeEl.textContent = MODE_LABELS[modeRef.current];
-      pipWin.document.body.appendChild(modeEl);
+      // Full layout
+      pipWin.document.body.innerHTML = `
+        <style>
+          * { box-sizing: border-box; }
+          body { background: #0e0410; }
+          .pip-wrap {
+            width: 100vw; height: 100vh;
+            background: linear-gradient(145deg, #130610 0%, #1e0a16 50%, #120310 100%);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 0; position: relative; overflow: hidden;
+          }
+          .pip-glow {
+            position: absolute; width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(203,67,139,0.18) 0%, transparent 70%);
+            border-radius: 50%; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); pointer-events: none;
+          }
+          .pip-mode {
+            color: #CB438B; font-size: 9px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.25em;
+            margin-bottom: 4px; position: relative; z-index: 1;
+          }
+          .pip-ring-wrap {
+            position: relative; width: 130px; height: 130px;
+            display: flex; align-items: center; justify-content: center;
+          }
+          .pip-ring-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+          .pip-center {
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column; align-items: center; gap: 0;
+          }
+          .pip-timer {
+            color: #fff; font-size: 44px; font-weight: 800;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-variant-numeric: tabular-nums; line-height: 1;
+            letter-spacing: -2px;
+            text-shadow: 0 0 30px rgba(203,67,139,0.6);
+          }
+          .pip-controls {
+            display: flex; gap: 10px; align-items: center;
+            margin-top: 12px; position: relative; z-index: 1;
+          }
+          .pip-btn-main {
+            width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer;
+            background: linear-gradient(135deg, #CB438B, #BF3556);
+            color: #fff; font-size: 20px; display: flex;
+            align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(203,67,139,0.5);
+            transition: transform 0.15s; outline: none;
+          }
+          .pip-btn-main:hover { transform: scale(1.1); }
+          .pip-btn-main:active { transform: scale(0.95); }
+          .pip-label {
+            color: rgba(255,229,208,0.55); font-size: 9px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.15em;
+            margin-top: 10px; position: relative; z-index: 1;
+          }
+          .pip-top-bar {
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #CB438B, #BF3556);
+          }
+        </style>
+        <div class="pip-wrap">
+          <div class="pip-top-bar"></div>
+          <div class="pip-glow"></div>
+          <div class="pip-mode" id="pip-mode">Focus</div>
+          <div class="pip-ring-wrap">
+            <svg width="130" height="130" viewBox="0 0 130 130" id="pip-svg">
+              <circle cx="65" cy="65" r="55" fill="none" stroke="rgba(203,67,139,0.18)" stroke-width="7"/>
+              <circle cx="65" cy="65" r="55" fill="none" stroke="url(#pg)" stroke-width="7"
+                stroke-linecap="round" id="pip-arc"
+                stroke-dasharray="345.4 345.4" stroke-dashoffset="0"/>
+              <defs>
+                <linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#CB438B"/>
+                  <stop offset="100%" stop-color="#BF3556"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="pip-center">
+              <div class="pip-timer" id="pip-timer">25:00</div>
+            </div>
+          </div>
+          <div class="pip-controls">
+            <button class="pip-btn-main" id="pip-btn">▶</button>
+          </div>
+          <div class="pip-label" id="pip-sessions">0 sessions done</div>
+        </div>
+      `;
 
-      const timerEl = pipWin.document.createElement("div");
-      timerEl.id = "pip-timer";
-      timerEl.style.cssText =
-        "color:#fff;font-size:56px;font-weight:700;font-variant-numeric:tabular-nums;" +
-        "line-height:1;text-shadow:0 0 20px rgba(203,67,139,0.5);letter-spacing:-1px;";
-      timerEl.textContent = fmt(timeLeft);
-      pipWin.document.body.appendChild(timerEl);
+      const timerEl    = pipWin.document.getElementById("pip-timer")!;
+      const modeEl     = pipWin.document.getElementById("pip-mode")!;
+      const btn        = pipWin.document.getElementById("pip-btn")!;
+      const arcEl      = pipWin.document.getElementById("pip-arc")!;
+      const sessionsEl = pipWin.document.getElementById("pip-sessions")!;
 
-      const btn = pipWin.document.createElement("button");
-      btn.id = "pip-btn";
-      btn.textContent = runningRef.current ? "⏸ Pause" : "▶ Resume";
-      btn.style.cssText =
-        "margin-top:4px;padding:8px 28px;border:none;border-radius:999px;" +
-        "background:linear-gradient(135deg,#CB438B,#BF3556);color:#fff;" +
-        "font-size:13px;font-weight:700;cursor:pointer;";
       btn.onclick = () => setRunning((r) => !r);
-      pipWin.document.body.appendChild(btn);
+
+      // Initial sync
+      const CIRC = 2 * Math.PI * 55;
+      const syncPip = (tl: number, md: Mode, run: boolean, sess: number, sett: typeof DEFAULT_SETTINGS) => {
+        const total = secsForMode(md, sett);
+        const prog  = total > 0 ? (total - tl) / total : 0;
+        timerEl.textContent    = fmt(tl);
+        modeEl.textContent     = MODE_LABELS[md];
+        btn.textContent        = run ? "⏸" : "▶";
+        arcEl.setAttribute("stroke-dasharray", `${CIRC * prog} ${CIRC}`);
+        sessionsEl.textContent = `${sess} session${sess !== 1 ? "s" : ""} done`;
+      };
+      syncPip(timeLeft, modeRef.current, runningRef.current, sessionsRef.current, settingsRef.current);
+      (pipWin as any).__syncPip = syncPip;
 
       pipWindowRef.current = pipWin;
       setPipOpen(true);
@@ -233,21 +371,30 @@ export default function FocusPage() {
   /* ── Cleanup PiP on unmount ── */
   useEffect(() => () => { closePip(); }, [closePip]);
 
+  /* ── First session START notification (fires when timer goes from paused → running in focus mode) ── */
+  useEffect(() => {
+    if (!prevRunningRef.current && running && modeRef.current === "focus") {
+      if (isFirstSessionStartToday()) {
+        setStartSessionToast(true);
+        setTimeout(() => setStartSessionToast(false), 5000);
+      }
+    }
+    prevRunningRef.current = running;
+  }, [running]);
+
   /* ── Sync timeLeft + mode + running into the PiP window every tick ── */
   useEffect(() => {
     const win = pipWindowRef.current;
-    if (!win) return;
-    const timerEl = win.document.getElementById("pip-timer");
-    const modeEl  = win.document.getElementById("pip-mode");
-    const btn      = win.document.getElementById("pip-btn");
-    if (timerEl) timerEl.textContent = fmt(timeLeft);
-    if (modeEl)  modeEl.textContent  = MODE_LABELS[mode];
-    if (btn)     btn.textContent     = running ? "⏸ Pause" : "▶ Resume";
-  }, [timeLeft, mode, running]);
+    if (!win || !win.__syncPip) return;
+    win.__syncPip(timeLeft, mode, running, sessions, settings);
+  }, [timeLeft, mode, running, sessions, settings]);
 
   /* ── Tasks (Supabase) ── */
   const [tasks, setTasks]     = useState<Task[]>([]);
   const [mobileTab, setMobileTab] = useState<"tasks" | "settings">("tasks");
+  const [firstSessionToast, setFirstSessionToast] = useState(false);
+  const [startSessionToast, setStartSessionToast] = useState(false);
+  const prevRunningRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -303,6 +450,16 @@ export default function FocusPage() {
     const s               = settingsRef.current;
 
     if (currentMode === "focus") {
+      // Log session to backend + mark study day in localStorage
+      markStudyDay();
+      if (isFirstSessionToday()) {
+        setFirstSessionToast(true);
+        setTimeout(() => setFirstSessionToast(false), 6000);
+      }
+      getToken().then((token) => {
+        if (token) apiLogSession(token, { duration_min: s.focus, mode: "focus", studied_on: todayISO() }).catch(() => {});
+      });
+
       const newSessions = currentSessions + 1;
       setSessions(newSessions);
       sessionsRef.current = newSessions;
@@ -318,7 +475,7 @@ export default function FocusPage() {
       setTimeLeft(secsForMode(next, s));
       if (s.autoStart) setTimeout(() => setRunning(true), 80);
     }
-  }, []); // stable: reads everything from refs
+  }, [getToken]); // stable: reads everything from refs
 
   /* ── Tick ── */
   useEffect(() => {
@@ -614,6 +771,68 @@ export default function FocusPage() {
             className="rounded-xl px-4 py-1.5 text-xs font-bold text-white shadow transition-all hover:scale-105"
             style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
             {running ? "⏸ Pause" : "▶ Resume"}
+          </button>
+        </div>
+      )}
+
+      {/* ── First session START toast ── */}
+      {startSessionToast && (
+        <div
+          className="fixed z-[10002] flex items-start gap-4 rounded-3xl border px-6 py-5 shadow-2xl backdrop-blur-2xl"
+          style={{
+            top: 24, left: "50%", transform: "translateX(-50%)",
+            background: "linear-gradient(135deg, rgba(20,6,12,0.97) 0%, rgba(30,8,18,0.97) 100%)",
+            borderColor: "rgba(203,67,139,0.50)",
+            minWidth: 300, maxWidth: 380,
+            animation: "slideDown 0.4s cubic-bezier(0.16,1,0.3,1)",
+          }}
+        >
+          <span style={{ fontSize: 32, lineHeight: 1 }}>🔥</span>
+          <div>
+            <p className="font-display text-base font-bold italic" style={{ color: "#FFE5D0" }}>
+              Let&apos;s goooo!
+            </p>
+            <p className="mt-0.5 text-sm leading-snug" style={{ color: "#C9A595" }}>
+              First session of the day — you showed up. Now stay locked in! 💪
+            </p>
+          </div>
+          <button
+            onClick={() => setStartSessionToast(false)}
+            className="ml-auto shrink-0 text-xs font-bold transition-opacity hover:opacity-70"
+            style={{ color: "#CB438B" }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* ── First session END toast ── */}
+      {firstSessionToast && (
+        <div
+          className="fixed z-[10001] flex items-start gap-4 rounded-3xl border px-6 py-5 shadow-2xl backdrop-blur-2xl"
+          style={{
+            top: 24, left: "50%", transform: "translateX(-50%)",
+            background: "linear-gradient(135deg, rgba(20,6,12,0.97) 0%, rgba(30,8,18,0.97) 100%)",
+            borderColor: "rgba(203,67,139,0.50)",
+            minWidth: 300, maxWidth: 380,
+            animation: "slideDown 0.4s cubic-bezier(0.16,1,0.3,1)",
+          }}
+        >
+          <span style={{ fontSize: 32, lineHeight: 1 }}>🌸</span>
+          <div>
+            <p className="font-display text-base font-bold italic" style={{ color: "#FFE5D0" }}>
+              First session done!
+            </p>
+            <p className="mt-0.5 text-sm leading-snug" style={{ color: "#C9A595" }}>
+              You showed up today — that&apos;s the hardest part. Keep crushing it! 💪
+            </p>
+          </div>
+          <button
+            onClick={() => setFirstSessionToast(false)}
+            className="ml-auto shrink-0 text-xs font-bold transition-opacity hover:opacity-70"
+            style={{ color: "#CB438B" }}
+          >
+            ✕
           </button>
         </div>
       )}

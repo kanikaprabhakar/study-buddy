@@ -86,6 +86,30 @@ export async function apiDeleteTask(token: string, id: string): Promise<void> {
   if (!res.ok && res.status !== 204) throw new Error(`apiDeleteTask: ${res.status}`);
 }
 
+/** Log a completed focus session */
+export async function apiLogSession(
+  token: string,
+  data: { duration_min: number; mode: string; studied_on?: string },
+): Promise<void> {
+  await fetch(`${BASE}/api/sessions`, {
+    method: "POST",
+    headers: headers(token),
+    body: JSON.stringify(data),
+  });
+  // fire-and-forget — don't throw; losing a log is non-critical
+}
+
+/** Get distinct study days (ISO strings) for the current week.
+ *  Pass `from` as the local-timezone Monday ISO string for timezone-correct filtering. */
+export async function fetchWeekStudyDays(token: string, from?: string): Promise<string[]> {
+  const url = from
+    ? `${BASE}/api/sessions/week?from=${encodeURIComponent(from)}`
+    : `${BASE}/api/sessions/week`;
+  const res = await fetch(url, { headers: headers(token) });
+  if (!res.ok) throw new Error(`fetchWeekStudyDays: ${res.status}`);
+  return res.json() as Promise<string[]>;
+}
+
 /* ── internal normaliser ── */
 function normaliseRow(row: Record<string, unknown>): Task {
   return {

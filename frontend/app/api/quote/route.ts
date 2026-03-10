@@ -16,10 +16,14 @@ export async function GET(request: Request) {
 
   try {
     const quote = await getQuote(id);
+    // Cache until the next UTC midnight so the CDN/browser drops the quote exactly when Quoterism rotates it.
+    const now = Date.now();
+    const nextMidnight = new Date();
+    nextMidnight.setUTCHours(24, 0, 0, 0);
+    const secondsUntilMidnight = Math.max(60, Math.floor((nextMidnight.getTime() - now) / 1000));
     return NextResponse.json(quote, {
       headers: {
-        // Cache for 24 hours — quote-of-the-day refreshes daily
-        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+        "Cache-Control": `public, s-maxage=${secondsUntilMidnight}, stale-while-revalidate=60`,
       },
     });
   } catch (err) {

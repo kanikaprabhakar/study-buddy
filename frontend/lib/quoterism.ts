@@ -1,5 +1,13 @@
 const BASE_URL = "https://quoterism.com/api";
 
+// Server-side in-memory cache — one Quoterism call per UTC day max
+let _cachedQuote: Quote | null = null;
+let _cachedDate = "";
+
+function todayUTC(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export interface QuoteAuthor {
   id: string;
   name: string;
@@ -30,12 +38,22 @@ function headers(): HeadersInit {
  * Use id = "random" or id = "quote-of-the-day" for special values.
  */
 export async function getQuote(id: string): Promise<Quote> {
+  const today = todayUTC();
+  // Serve from memory cache for quote-of-the-day so we don't hammer the API
+  if (id === "quote-of-the-day" && _cachedQuote && _cachedDate === today) {
+    return _cachedQuote;
+  }
   const res = await fetch(`${BASE_URL}/quotes/${id}`, {
     headers: headers(),
-    next: { revalidate: 86400 }, // cache for 24 hours (daily quote)
+    cache: "no-store",
   });
   if (!res.ok) throw new Error(`Quoterism error: ${res.status}`);
-  return res.json() as Promise<Quote>;
+  const quote = await res.json() as Quote;
+  if (id === "quote-of-the-day") {
+    _cachedQuote = quote;
+    _cachedDate = today;
+  }
+  return quote;
 }
 
 /**

@@ -232,6 +232,26 @@ export default function TasksPage() {
                 {/* Deadline */}
                 <div className="flex flex-1 flex-col gap-1.5 min-w-[160px]">
                   <label className="text-xs font-bold uppercase tracking-wider text-fg-secondary">Deadline</label>
+                  <div className="flex gap-2">
+                    {(["Today", "Tomorrow"] as const).map((label) => {
+                      const d = new Date();
+                      if (label === "Tomorrow") d.setDate(d.getDate() + 1);
+                      const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+                      const active = form.deadline === iso;
+                      return (
+                        <button key={label} type="button"
+                          onClick={() => setForm((f) => ({ ...f, deadline: active ? "" : iso }))}
+                          className="rounded-xl px-3 py-2 text-xs font-bold transition-all"
+                          style={{
+                            background: active ? "linear-gradient(135deg,#CB438B,#BF3556)" : (dark ? "rgba(203,67,139,0.12)" : "rgba(203,67,139,0.09)"),
+                            color: active ? "#fff" : "#CB438B",
+                            border: `1px solid ${active ? "transparent" : inputBdr}`,
+                          }}>
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
                   <input
                     type="date"
                     value={form.deadline}
@@ -325,11 +345,16 @@ export default function TasksPage() {
                         {m.label}
                       </span>
                       {/* Deadline */}
-                      {task.deadline && (
+                      {task.deadline ? (
                         <span className="text-xs text-fg-secondary" style={{ color: overdue ? "#BF3556" : undefined }}>
                           {overdue ? "! " : ""}
                           {new Date(task.deadline + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                           {overdue ? " — overdue" : ""}
+                        </span>
+                      ) : (
+                        <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                          style={{ background: dark ? "rgba(108,106,67,0.20)" : "rgba(108,106,67,0.12)", color: "#8b8a5a" }}>
+                          Ongoing ∞
                         </span>
                       )}
                     </div>

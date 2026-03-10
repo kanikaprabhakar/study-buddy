@@ -10,6 +10,7 @@ import type { Quote } from "@/lib/quoterism";
 import {
   fetchTasks,
   apiPatchTask,
+  fetchWeekStudyDays,
   sortTasks,
   PRIORITY_META,
   type Task,
@@ -25,6 +26,11 @@ const FLOATERS = [
   { src: "/images/9.png",  w: 70,  top: "72%",   left: "0%",   anim: "animate-float-slow",   delay: "1.5s" },
   { src: "/images/17.png", w: 80,  top: "26%",   right: "0%",  anim: "animate-float-medium", delay: "0.9s" },
 ] as const;
+
+/** Local-timezone YYYY-MM-DD — avoids UTC offset shifting the date */
+function localISO(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 type Props = { firstName: string | null; lastName: string | null; isNew?: boolean };
 
@@ -51,12 +57,68 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Weekly study days from backend (focus sessions) + localStorage (task completions)
+  const [weekDays, setWeekDays] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    let cancelled = false;
+
+    // Compute local week's Monday (Mon=0 ... Sun=6)
+    const now = new Date();
+    const dayOfWeek = (now.getDay() + 6) % 7;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - dayOfWeek);
+    const mondayISO = localISO(monday);
+    const sundayDate = new Date(monday);
+    sundayDate.setDate(monday.getDate() + 6);
+    const sundayISO = localISO(sundayDate);
+
+    // Get days from backend (focus sessions), passing local week start for timezone-correct filtering
+    getToken().then((token) => {
+      if (!token || cancelled) return;
+      fetchWeekStudyDays(token, mondayISO)
+        .then((days) => {
+          if (cancelled) return;
+          setWeekDays((prev) => new Set([...prev, ...days]));
+        })
+        .catch(() => {});
+    });
+
+    // Also read localStorage study_days (task completions marked there)
+    try {
+      const raw = localStorage.getItem("zenith_study_days");
+      if (raw) {
+        const stored: string[] = JSON.parse(raw);
+        // Compare ISO strings directly — no Date parsing, no timezone issues
+        const thisWeek = stored.filter((d) => d >= mondayISO && d <= sundayISO);
+        if (thisWeek.length > 0) {
+          setWeekDays((prev) => new Set([...prev, ...thisWeek]));
+        }
+      }
+    } catch {}
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Optimistic toggle
   const handleToggle = useCallback(async (taskId: string) => {
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
     // optimistic update
     setTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, done: !t.done } : t));
+    // if completing a task, mark today as a study day
+    if (!task.done) {
+      try {
+        const today = localISO(new Date());
+        const raw = localStorage.getItem("zenith_study_days");
+        const days: string[] = raw ? JSON.parse(raw) : [];
+        if (!days.includes(today)) {
+          days.push(today);
+          localStorage.setItem("zenith_study_days", JSON.stringify(days.slice(-30)));
+          setWeekDays((prev) => new Set([...prev, today]));
+        }
+      } catch {}
+    }
     try {
       const token = await getToken();
       if (!token) throw new Error("no token");
@@ -283,23 +345,7 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
           {/* Weekly progress — spans both cols */}
           <div className="md:col-span-2">
             <DashCard title="Weekly Progress">
-              <div className="space-y-3">
-                <div
-                  className="h-3 w-full overflow-hidden rounded-full"
-                  style={{ background: dark ? "rgba(203,67,139,0.18)" : "rgba(203,67,139,0.12)" }}
-                  role="progressbar"
-                  aria-label="Weekly study progress"
-                  aria-valuenow={40}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                >
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{ width: "40%", background: "linear-gradient(90deg,#CB438B,#BF3556)" }}
-                  />
-                </div>
-                <p className="text-sm text-fg-secondary">2 / 5 study days completed this week</p>
-              </div>
+              <WeeklyProgress weekDays={weekDays} dark={dark} />
             </DashCard>
           </div>
 
@@ -438,12 +484,16 @@ function MiniTasks({
               >
                 {task.title}
               </span>
-              <span
-                className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold"
-                style={{ background: dark ? m.darkBg : m.bg, color: m.color }}
-              >
-                {m.label}
-              </span>
+              {task.deadline ? (
+                <span className="shrink-0 text-[10px] text-fg-secondary">
+                  {new Date(task.deadline + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                </span>
+              ) : (
+                <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold"
+                  style={{ background: dark ? "rgba(108,106,67,0.20)" : "rgba(108,106,67,0.12)", color: "#8b8a5a" }}>
+                  ∞
+                </span>
+              )}
             </li>
           );
         })}
@@ -456,6 +506,89 @@ function MiniTasks({
       >
         View all {tasks.length} task{tasks.length !== 1 ? "s" : ""} →
       </Link>
+    </div>
+  );
+}
+
+/* ─── Weekly Progress ─── */
+const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function WeeklyProgress({ weekDays, dark }: { weekDays: Set<string>; dark: boolean }) {
+  // Build Mon–Sun dates for the current week
+  const monday = (() => {
+    const now = new Date();
+    const d = new Date(now);
+    d.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+    d.setHours(0, 0, 0, 0);
+    return d;
+  })();
+
+  const days = WEEK_DAYS.map((label, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const iso = localISO(d);
+    const isToday = iso === localISO(new Date());
+    const studied = weekDays.has(iso);
+    const isPast  = d < new Date() && !isToday;
+    return { label, iso, studied, isToday, isPast };
+  });
+
+  const studiedCount = days.filter((d) => d.studied).length;
+  const pct = Math.round((studiedCount / 7) * 100);
+
+  return (
+    <div className="space-y-4">
+      {/* Day dots */}
+      <div className="flex items-end justify-between gap-1">
+        {days.map(({ label, studied, isToday, isPast }) => (
+          <div key={label} className="flex flex-1 flex-col items-center gap-1.5">
+            <div
+              className="w-full rounded-xl transition-all duration-500"
+              style={{
+                height: 36,
+                background: studied
+                  ? "linear-gradient(135deg,#CB438B,#BF3556)"
+                  : isToday
+                  ? dark ? "rgba(203,67,139,0.22)" : "rgba(203,67,139,0.15)"
+                  : dark ? "rgba(203,67,139,0.09)" : "rgba(203,67,139,0.06)",
+                boxShadow: studied ? "0 0 12px rgba(203,67,139,0.40)" : "none",
+                outline: isToday ? "2px solid rgba(203,67,139,0.55)" : "none",
+                outlineOffset: 2,
+                opacity: isPast && !studied ? 0.5 : 1,
+              }}
+            />
+            <span
+              className="text-[10px] font-bold uppercase tracking-wide"
+              style={{ color: isToday ? "#CB438B" : "var(--fg-secondary)", opacity: isToday ? 1 : 0.75 }}
+            >
+              {label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Progress bar */}
+      <div
+        className="h-2.5 w-full overflow-hidden rounded-full"
+        style={{ background: dark ? "rgba(203,67,139,0.18)" : "rgba(203,67,139,0.12)" }}
+        role="progressbar"
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className="h-full rounded-full transition-all duration-700"
+          style={{ width: `${pct}%`, background: "linear-gradient(90deg,#CB438B,#BF3556)" }}
+        />
+      </div>
+
+      <p className="text-sm text-fg-secondary">
+        {studiedCount === 0
+          ? "No study days logged yet this week — let's go! 🚀"
+          : studiedCount === 7
+          ? "Perfect week! Every single day. You're unstoppable 🔥"
+          : `${studiedCount} / 7 days studied this week${studiedCount >= 5 ? " 🔥" : studiedCount >= 3 ? " ✨" : ""}`}
+      </p>
     </div>
   );
 }

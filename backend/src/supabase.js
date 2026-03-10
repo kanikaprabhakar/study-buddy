@@ -15,6 +15,7 @@ const sql = postgres(connectionString, {
 	idle_timeout: 20,
 	max_lifetime: 1800,
 	connect_timeout: 30,
+	prepare: false, // required for Supabase transaction-mode pooler (pgBouncer)
 })
 
 export default sql

@@ -32,7 +32,7 @@ export default function Home() {
               Smarter.
             </h2>
             <h2 className="font-display text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl lg:text-8xl" style={{ color: "#BF3556" }}>
-              Glow Up.
+              Level Up.
             </h2>
           </div>
 

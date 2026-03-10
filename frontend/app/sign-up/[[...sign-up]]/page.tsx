@@ -117,7 +117,7 @@ export default function SignUpPage() {
             Start your journey.
           </h1>
           <p className="mt-1 text-sm text-fg-secondary">
-            Study smarter. Glow up.
+            Study smarter. Level up.
           </p>
         </div>
 
