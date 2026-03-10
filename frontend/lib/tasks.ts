@@ -211,6 +211,76 @@ export async function apiDeleteResource(token: string, id: string): Promise<void
   if (!res.ok && res.status !== 204) throw new Error(`apiDeleteResource: ${res.status}`);
 }
 
+/* ── Notes ── */
+
+export interface Note {
+  id: string;
+  heading: string;
+  description?: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+function normaliseNote(row: Record<string, unknown>): Note {
+  return {
+    id:          String(row.id),
+    heading:     String(row.heading ?? "Untitled"),
+    description: row.description ? String(row.description) : undefined,
+    content:     String(row.content ?? ""),
+    createdAt:   String(row.createdAt ?? row.created_at ?? new Date().toISOString()),
+    updatedAt:   String(row.updatedAt ?? row.updated_at ?? new Date().toISOString()),
+  };
+}
+
+export async function fetchNotes(token: string): Promise<Note[]> {
+  const res = await fetch(`${BASE}/api/notes`, { headers: headers(token) });
+  if (!res.ok) throw new Error(`fetchNotes: ${res.status}`);
+  const rows = await res.json() as Array<Record<string, unknown>>;
+  return rows.map(normaliseNote);
+}
+
+export async function fetchNote(token: string, id: string): Promise<Note> {
+  const res = await fetch(`${BASE}/api/notes/${id}`, { headers: headers(token) });
+  if (!res.ok) throw new Error(`fetchNote: ${res.status}`);
+  return normaliseNote(await res.json() as Record<string, unknown>);
+}
+
+export async function apiCreateNote(
+  token: string,
+  data: { heading?: string; description?: string; content?: string },
+): Promise<Note> {
+  const res = await fetch(`${BASE}/api/notes`, {
+    method: "POST",
+    headers: headers(token),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`apiCreateNote: ${res.status}`);
+  return normaliseNote(await res.json() as Record<string, unknown>);
+}
+
+export async function apiPatchNote(
+  token: string,
+  id: string,
+  patch: Partial<{ heading: string; description: string; content: string }>,
+): Promise<Note> {
+  const res = await fetch(`${BASE}/api/notes/${id}`, {
+    method: "PATCH",
+    headers: headers(token),
+    body: JSON.stringify(patch),
+  });
+  if (!res.ok) throw new Error(`apiPatchNote: ${res.status}`);
+  return normaliseNote(await res.json() as Record<string, unknown>);
+}
+
+export async function apiDeleteNote(token: string, id: string): Promise<void> {
+  const res = await fetch(`${BASE}/api/notes/${id}`, {
+    method: "DELETE",
+    headers: headers(token),
+  });
+  if (!res.ok && res.status !== 204) throw new Error(`apiDeleteNote: ${res.status}`);
+}
+
 /* ── Google Calendar ── */
 
 export interface GCalEvent {

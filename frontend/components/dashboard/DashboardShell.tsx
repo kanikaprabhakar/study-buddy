@@ -23,6 +23,9 @@ import {
   fetchGCalAuthUrl,
   fetchGCalEvents,
   apiGCalDisconnect,
+  fetchNotes,
+  apiCreateNote,
+  type Note,
 } from "@/lib/tasks";
 
 const FLOATERS = [
@@ -60,6 +63,20 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
       if (!token || cancelled) return;
       fetchTasks(token)
         .then((t) => { if (!cancelled) setTasks(t); })
+        .catch(() => {});
+    });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Notes state
+  const [notes, setNotes] = useState<Note[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    getToken().then((token) => {
+      if (!token || cancelled) return;
+      fetchNotes(token)
+        .then((n) => { if (!cancelled) setNotes(n); })
         .catch(() => {});
     });
     return () => { cancelled = true; };
@@ -461,6 +478,11 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
             </Link>
           </DashCard>
 
+          {/* Notes */}
+          <DashCard title="Notes" href="/notes">
+            <MiniNotes notes={notes} dark={dark} getToken={getToken} onCreated={(note) => setNotes((prev) => [note, ...prev])} />
+          </DashCard>
+
           {/* Google Calendar */}
           <DashCard title="Google Calendar">
             <GCalWidget
@@ -497,6 +519,7 @@ const NAV_PAGES = [
   { href: "/tasks",     label: "Tasks",       img: "/images/15.png", sub: "Manage your to-dos" },
   { href: "/focus",     label: "Focus Timer", img: "/images/17.png", sub: "Pomodoro sessions" },
   { href: "/resources", label: "Resources",   img: "/images/14.png", sub: "Your bookmarks" },
+  { href: "/notes",     label: "Notes",       img: "/images/20.png", sub: "Your writing space" },
 ] as const;
 
 function NavDropdown({ dark }: { dark: boolean }) {
@@ -861,6 +884,84 @@ function MiniResources({ resources, dark }: { resources: Resource[]; dark: boole
         onClick={(e) => e.stopPropagation()}>
         View all {resources.length} resource{resources.length !== 1 ? "s" : ""} →
       </Link>
+    </div>
+  );
+}
+
+/* ─── Mini Notes widget ─── */
+function MiniNotes({
+  notes, dark, getToken, onCreated,
+}: {
+  notes: Note[];
+  dark: boolean;
+  getToken: () => Promise<string | null>;
+  onCreated: (note: Note) => void;
+}) {
+  const [creating, setCreating] = useState(false);
+
+  async function handleNewNote(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (creating) return;
+    setCreating(true);
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const note = await apiCreateNote(token, { heading: "Untitled", content: "" });
+      onCreated(note);
+      // Navigate to editor
+      window.location.href = `/notes/${note.id}`;
+    } catch {
+      setCreating(false);
+    }
+  }
+
+  const recent = notes.slice(0, 3);
+
+  if (notes.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-4 opacity-70">
+        <p className="text-sm italic text-fg-secondary">No notes yet — start writing!</p>
+        <button onClick={handleNewNote} disabled={creating}
+          className="relative z-10 rounded-xl px-4 py-2 text-xs font-bold text-white transition-all hover:scale-105 cursor-pointer disabled:opacity-60"
+          style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
+          {creating ? "Creating…" : "+ New Note"}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <ul className="space-y-2">
+        {recent.map((n) => (
+          <li key={n.id}>
+            <Link href={`/notes/${n.id}`} onClick={(e) => e.stopPropagation()}
+              className="flex items-start gap-2 rounded-xl p-2 transition-all hover:scale-[1.01] group"
+              style={{ background: dark ? "rgba(203,67,139,0.06)" : "rgba(203,67,139,0.04)" }}>
+              <span className="mt-0.5 shrink-0 text-base leading-none">📝</span>
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-sm font-semibold text-fg-primary group-hover:underline">{n.heading}</p>
+                {n.description && (
+                  <p className="truncate text-[11px] text-fg-secondary opacity-70">{n.description}</p>
+                )}
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 flex items-center justify-between">
+        <Link href="/notes"
+          className="relative z-10 text-xs font-bold transition-all hover:scale-105"
+          style={{ color: "#CB438B" }}
+          onClick={(e) => e.stopPropagation()}>
+          View all {notes.length} note{notes.length !== 1 ? "s" : ""} →
+        </Link>
+        <button onClick={handleNewNote} disabled={creating}
+          className="relative z-10 rounded-xl px-3 py-1.5 text-[11px] font-bold text-white transition-all hover:scale-105 cursor-pointer disabled:opacity-60"
+          style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
+          {creating ? "…" : "+ New"}
+        </button>
+      </div>
     </div>
   );
 }

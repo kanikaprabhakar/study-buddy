@@ -3,7 +3,7 @@ import dns from "node:dns";
 import cors from "cors";
 import express from "express";
 
-import { ensureUsersSchema, ensureTasksSchema, ensureSessionsSchema, ensureResourcesSchema, ensureCalendarSchema } from "./db/schema.js";
+import { ensureUsersSchema, ensureTasksSchema, ensureSessionsSchema, ensureResourcesSchema, ensureCalendarSchema, ensureNotesSchema } from "./db/schema.js";
 import { getDaySummary } from "./controllers/tasks.js";
 import { internalSyncUser } from "./controllers/webhooks.js";
 import taskRoutes     from "./routes/tasks.js";
@@ -11,6 +11,7 @@ import sessionRoutes  from "./routes/sessions.js";
 import resourceRoutes from "./routes/resources.js";
 import gcalRoutes     from "./routes/gcal.js";
 import webhookRoutes  from "./routes/webhooks.js";
+import noteRoutes     from "./routes/notes.js";
 
 dns.setDefaultResultOrder("ipv4first");
 
@@ -30,6 +31,7 @@ app.use("/api/sessions",  sessionRoutes);
 app.use("/api/resources", resourceRoutes);
 app.use("/api/gcal",      gcalRoutes);
 app.use("/api/webhooks",  webhookRoutes);
+app.use("/api/notes",     noteRoutes);
 app.post("/api/internal/sync-user", express.json(), internalSyncUser);
 
 // Kept at original URL â€” frontend calls GET /api/day-summary
@@ -42,6 +44,7 @@ Promise.all([
 	ensureSessionsSchema(),
 	ensureResourcesSchema(),
 	ensureCalendarSchema(),
+	ensureNotesSchema(),
 ]).then(() => {
 	app.listen(port, () => console.log(`Zenith backend running on http://localhost:${port}`));
 }).catch((err) => {

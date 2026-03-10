@@ -87,6 +87,21 @@ export async function ensureResourcesSchema() {
 	await sql`create index if not exists resources_clerk_id_idx on public.resources (clerk_id)`;
 }
 
+export async function ensureNotesSchema() {
+	await sql`
+		create table if not exists public.notes (
+			id          uuid primary key default gen_random_uuid(),
+			clerk_id    text not null,
+			heading     text not null default 'Untitled',
+			description text,
+			content     text not null default '',
+			created_at  timestamptz not null default now(),
+			updated_at  timestamptz not null default now()
+		)
+	`;
+	await sql`create index if not exists notes_clerk_id_idx on public.notes (clerk_id)`;
+}
+
 export async function ensureCalendarSchema() {
 	await sql`alter table public.calendar_connections add column if not exists clerk_id text`;
 	await sql`alter table public.calendar_connections add column if not exists access_token text`;
