@@ -568,27 +568,17 @@ export default function FocusPage() {
             <button
               onClick={toggleFullscreen}
               title={isFullscreen ? "Exit fullscreen" : "Go fullscreen"}
-              className="flex h-8 w-8 items-center justify-center rounded-xl border text-sm font-bold text-fg-secondary transition-all hover:scale-110"
+              className="flex h-8 w-8 items-center justify-center rounded-xl border text-sm font-bold text-fg-secondary transition-all hover:scale-110 cursor-pointer"
               style={{ border: "1.5px solid rgba(203,67,139,0.30)", background: dark ? "rgba(203,67,139,0.08)" : "rgba(255,240,220,0.60)", backdropFilter: "blur(10px)" }}>
               {isFullscreen ? "⊡" : "⛶"}
             </button>
-            {pipSupported ? (
-              <button
-                onClick={togglePip}
-                title={pipOpen ? "Close mini player" : "Pop out mini player"}
-                className="flex h-8 w-8 items-center justify-center rounded-xl border text-sm font-bold text-fg-secondary transition-all hover:scale-110"
-                style={{ border: `1.5px solid ${pipOpen ? "rgba(203,67,139,0.50)" : "rgba(203,67,139,0.30)"}`, background: pipOpen ? (dark ? "rgba(203,67,139,0.20)" : "rgba(203,67,139,0.12)") : (dark ? "rgba(203,67,139,0.08)" : "rgba(255,240,220,0.60)"), backdropFilter: "blur(10px)" }}>
-                ⧉
-              </button>
-            ) : (
-              <button
-                onClick={() => setPipOpen((p) => !p)}
-                title={pipOpen ? "Close mini player" : "Pop out mini player"}
-                className="flex h-8 w-8 items-center justify-center rounded-xl border text-sm font-bold text-fg-secondary transition-all hover:scale-110"
-                style={{ border: `1.5px solid ${pipOpen ? "rgba(203,67,139,0.50)" : "rgba(203,67,139,0.30)"}`, background: pipOpen ? (dark ? "rgba(203,67,139,0.20)" : "rgba(203,67,139,0.12)") : (dark ? "rgba(203,67,139,0.08)" : "rgba(255,240,220,0.60)"), backdropFilter: "blur(10px)" }}>
-                ⧉
-              </button>
-            )}
+            <button
+              onClick={pipSupported ? togglePip : () => setPipOpen((p) => !p)}
+              title={pipOpen ? "Close mini player" : "Pop out mini player"}
+              className="flex h-8 w-8 items-center justify-center rounded-xl border text-sm font-bold text-fg-secondary transition-all hover:scale-110 cursor-pointer"
+              style={{ border: `1.5px solid ${pipOpen ? "rgba(203,67,139,0.50)" : "rgba(203,67,139,0.30)"}`, background: pipOpen ? (dark ? "rgba(203,67,139,0.20)" : "rgba(203,67,139,0.12)") : (dark ? "rgba(203,67,139,0.08)" : "rgba(255,240,220,0.60)"), backdropFilter: "blur(10px)" }}>
+              ⧉
+            </button>
             <ThemeToggle />
           </div>
         </header>
@@ -602,7 +592,7 @@ export default function FocusPage() {
           <div className="mb-6 flex justify-center gap-2">
             {(["focus", "short", "long"] as Mode[]).map((m) => (
               <button key={m} onClick={() => switchMode(m)}
-                className="rounded-2xl px-4 py-2 text-sm font-bold transition-all hover:scale-105"
+                className="rounded-2xl px-4 py-2 text-sm font-bold transition-all hover:scale-105 cursor-pointer"
                 style={{
                   background: mode === m ? "linear-gradient(135deg,#CB438B,#BF3556)" : (dark ? "rgba(203,67,139,0.12)" : "rgba(255,240,220,0.60)"),
                   color: mode === m ? "#fff" : "var(--fg-primary)",
@@ -676,14 +666,14 @@ export default function FocusPage() {
               {/* Controls */}
               <div className="flex items-center gap-4">
                 <button onClick={() => { setRunning(false); setTimeLeft(secsForMode(mode, settings)); }}
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl border font-bold text-fg-secondary transition-all hover:scale-110"
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl border font-bold text-fg-secondary transition-all hover:scale-110 cursor-pointer"
                   style={{ border: "1.5px solid rgba(203,67,139,0.30)", background: dark ? "rgba(203,67,139,0.08)" : "rgba(255,240,220,0.60)", backdropFilter: "blur(10px)" }}
                   title="Reset">
                   ↺
                 </button>
 
                 <button onClick={() => setRunning((r) => !r)}
-                  className="flex h-20 w-20 items-center justify-center rounded-full font-bold text-white shadow-2xl transition-all hover:scale-110 active:scale-95 animate-pulse-glow"
+                  className="flex h-20 w-20 items-center justify-center rounded-full font-bold text-white shadow-2xl transition-all hover:scale-110 active:scale-95 animate-pulse-glow cursor-pointer"
                   style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)", fontSize: "2rem" }}>
                   {running ? "⏸" : "▶"}
                 </button>
@@ -691,7 +681,7 @@ export default function FocusPage() {
                 <button
                   onClick={() => setShowSettings((s) => !s)}
                   title={showSettings ? "Hide settings" : "Show settings"}
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl border font-bold text-fg-secondary transition-all hover:scale-110"
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl border font-bold text-fg-secondary transition-all hover:scale-110 cursor-pointer"
                   style={{
                     border: `1.5px solid ${showSettings ? "rgba(203,67,139,0.50)" : "rgba(203,67,139,0.30)"}`,
                     background: showSettings ? (dark ? "rgba(203,67,139,0.20)" : "rgba(203,67,139,0.12)") : (dark ? "rgba(203,67,139,0.08)" : "rgba(255,240,220,0.60)"),
@@ -705,7 +695,7 @@ export default function FocusPage() {
               <div className="flex w-full gap-2 lg:hidden">
                 {(["tasks", "settings"] as const).map((t) => (
                   <button key={t} onClick={() => setMobileTab(t)}
-                    className="flex-1 rounded-2xl py-2 text-sm font-bold transition-all"
+                    className="flex-1 rounded-2xl py-2 text-sm font-bold transition-all cursor-pointer"
                     style={{
                       background: mobileTab === t ? "linear-gradient(135deg,#CB438B,#BF3556)" : (dark ? "rgba(203,67,139,0.10)" : "rgba(255,240,220,0.60)"),
                       color: mobileTab === t ? "#fff" : "var(--fg-secondary)",
@@ -746,7 +736,7 @@ export default function FocusPage() {
           <span className="mr-1 text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: "#CB438B", opacity: 0.8 }}>bg</span>
           {BACKGROUNDS.map((bg, i) => (
             <button key={i} onClick={() => setBgIdx(i)} title={bg.label}
-              className="relative overflow-hidden rounded-xl transition-all hover:scale-110"
+              className="relative overflow-hidden rounded-xl transition-all hover:scale-110 cursor-pointer"
               style={{ width: 36, height: 36, outline: i === bgIdx ? "2.5px solid #CB438B" : "2.5px solid transparent", outlineOffset: 2 }}>
               <img src={bg.src} alt={bg.label} className="h-full w-full object-cover" />
             </button>
@@ -768,7 +758,7 @@ export default function FocusPage() {
           </span>
           <button
             onClick={() => setRunning((r) => !r)}
-            className="rounded-xl px-4 py-1.5 text-xs font-bold text-white shadow transition-all hover:scale-105"
+            className="rounded-xl px-4 py-1.5 text-xs font-bold text-white shadow transition-all hover:scale-105 cursor-pointer"
             style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
             {running ? "⏸ Pause" : "▶ Resume"}
           </button>
@@ -798,7 +788,7 @@ export default function FocusPage() {
           </div>
           <button
             onClick={() => setStartSessionToast(false)}
-            className="ml-auto shrink-0 text-xs font-bold transition-opacity hover:opacity-70"
+            className="ml-auto shrink-0 text-xs font-bold transition-opacity hover:opacity-70 cursor-pointer"
             style={{ color: "#CB438B" }}
           >
             ✕
@@ -829,7 +819,7 @@ export default function FocusPage() {
           </div>
           <button
             onClick={() => setFirstSessionToast(false)}
-            className="ml-auto shrink-0 text-xs font-bold transition-opacity hover:opacity-70"
+            className="ml-auto shrink-0 text-xs font-bold transition-opacity hover:opacity-70 cursor-pointer"
             style={{ color: "#CB438B" }}
           >
             ✕
@@ -851,12 +841,12 @@ export default function FocusPage() {
             </div>
             <div className="flex gap-3">
               <button onClick={() => setSaveModal(null)}
-                className="flex-1 rounded-2xl py-2 text-sm font-bold text-fg-secondary border transition-all hover:scale-105"
+                className="flex-1 rounded-2xl py-2 text-sm font-bold text-fg-secondary border transition-all hover:scale-105 cursor-pointer"
                 style={{ borderColor: "rgba(203,67,139,0.25)", background: "transparent" }}>
                 Cancel
               </button>
               <button onClick={() => saveQuickTask(saveModal)} disabled={saveLoading}
-                className="flex-1 rounded-2xl py-2 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 disabled:opacity-60"
+                className="flex-1 rounded-2xl py-2 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 disabled:opacity-60 cursor-pointer"
                 style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
                 {saveLoading ? "Saving…" : "Save Task"}
               </button>
@@ -916,7 +906,7 @@ function TasksPanel({
                   className="flex items-center gap-2.5 rounded-xl p-2.5 transition-all hover:scale-[1.02]"
                   style={{ background: dark ? "rgba(203,67,139,0.07)" : "rgba(203,67,139,0.05)", border: "1px solid rgba(203,67,139,0.12)" }}>
                   <button onClick={() => onToggle(task)} aria-label="Toggle"
-                    className="shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110"
+                    className="shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
                     style={{ borderColor: "#CB438B", background: "transparent" }} />
                   <span className="flex-1 truncate text-xs font-semibold text-fg-primary">{task.title}</span>
                   <span className="shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold"
@@ -957,7 +947,7 @@ function TasksPanel({
             }}
           />
           <button onClick={onAddQuick}
-            className="shrink-0 rounded-xl px-3 py-2 text-xs font-bold text-white transition-all hover:scale-105"
+            className="shrink-0 rounded-xl px-3 py-2 text-xs font-bold text-white transition-all hover:scale-105 cursor-pointer"
             style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
             +
           </button>
@@ -971,7 +961,7 @@ function TasksPanel({
                 className="flex items-center gap-2 rounded-xl p-2 transition-all"
                 style={{ background: dark ? "rgba(203,67,139,0.06)" : "rgba(203,67,139,0.04)", border: "1px solid rgba(203,67,139,0.10)" }}>
                 <button onClick={() => onToggleQuick(qt)}
-                  className="shrink-0 h-4 w-4 rounded-full border-2 flex items-center justify-center transition-all"
+                  className="shrink-0 h-4 w-4 rounded-full border-2 flex items-center justify-center transition-all cursor-pointer"
                   style={{ borderColor: qt.done ? "#CB438B" : "rgba(203,67,139,0.40)", background: qt.done ? "#CB438B" : "transparent" }}>
                   {qt.done && <span className="text-white text-[8px] leading-none">✓</span>}
                 </button>
@@ -980,12 +970,12 @@ function TasksPanel({
                   {qt.title}
                 </span>
                 <button onClick={() => onSaveQuick(qt)} title="Save to task list"
-                  className="shrink-0 text-[11px] font-bold transition-all hover:scale-110 opacity-60 hover:opacity-100"
+                  className="shrink-0 text-[11px] font-bold transition-all hover:scale-110 opacity-60 hover:opacity-100 cursor-pointer"
                   style={{ color: "#CB438B" }}>
                   ↑
                 </button>
                 <button onClick={() => onRemoveQuick(qt.id)} title="Remove"
-                  className="shrink-0 text-[10px] transition-all hover:scale-110 opacity-40 hover:opacity-70 text-fg-secondary">
+                  className="shrink-0 text-[10px] transition-all hover:scale-110 opacity-40 hover:opacity-70 text-fg-secondary cursor-pointer">
                   ✕
                 </button>
               </li>
@@ -1050,7 +1040,7 @@ function SettingsPanel({ settings, onApply, dark }: { settings: SettingsState; o
           {presets.map((p) => (
             <button key={p.label}
               onClick={() => { const next = { ...local, focus: p.focus, short: p.short, long: p.long }; setLocal(next); onApply(next); }}
-              className="flex-1 rounded-xl py-2 text-xs font-bold transition-all hover:scale-105"
+              className="flex-1 rounded-xl py-2 text-xs font-bold transition-all hover:scale-105 cursor-pointer"
               style={{
                 background: local.focus === p.focus ? "linear-gradient(135deg,#CB438B,#BF3556)" : (dark ? "rgba(203,67,139,0.10)" : "rgba(203,67,139,0.06)"),
                 color: local.focus === p.focus ? "#fff" : "var(--fg-secondary)",
@@ -1076,7 +1066,7 @@ function SettingsPanel({ settings, onApply, dark }: { settings: SettingsState; o
         </div>
         <button
           onClick={() => { const next = { ...local, autoStart: !local.autoStart }; setLocal(next); onApply(next); }}
-          className="relative h-6 w-11 shrink-0 rounded-full transition-colors duration-300 overflow-hidden"
+          className="relative h-6 w-11 shrink-0 rounded-full transition-colors duration-300 overflow-hidden cursor-pointer"
           style={{ background: local.autoStart ? "linear-gradient(135deg,#CB438B,#BF3556)" : (dark ? "rgba(203,67,139,0.20)" : "rgba(203,67,139,0.15)") }}>
           <span className="absolute top-[2px] h-5 w-5 rounded-full bg-white shadow transition-all duration-300"
             style={{ left: local.autoStart ? "22px" : "2px" }} />
@@ -1085,7 +1075,7 @@ function SettingsPanel({ settings, onApply, dark }: { settings: SettingsState; o
 
       {/* Apply button */}
       <button onClick={() => onApply(local)}
-        className="mt-5 w-full rounded-2xl py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105"
+        className="mt-5 w-full rounded-2xl py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 cursor-pointer"
         style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
         Apply Settings
       </button>

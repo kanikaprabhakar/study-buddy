@@ -16,6 +16,7 @@ const sql = postgres(connectionString, {
 	max_lifetime: 1800,
 	connect_timeout: 30,
 	prepare: false, // required for Supabase transaction-mode pooler (pgBouncer)
+	onnotice: () => {}, // suppress "already exists, skipping" notices on startup
 })
 
 export default sql

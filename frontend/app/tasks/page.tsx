@@ -208,7 +208,7 @@ export default function TasksPage() {
           <div className="flex items-center gap-2">
             {(["all", "active", "done"] as const).map((f) => (
               <button key={f} onClick={() => setFilter(f)}
-                className="rounded-xl px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all"
+                className="rounded-xl px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
                 style={{
                   background: filter === f ? "linear-gradient(135deg,#CB438B,#BF3556)" : (dark ? "rgba(203,67,139,0.12)" : "rgba(203,67,139,0.09)"),
                   color: filter === f ? "#fff" : "var(--fg-secondary)",
@@ -219,7 +219,7 @@ export default function TasksPage() {
             ))}
           </div>
           <button onClick={() => { setEditId(null); setForm(EMPTY_FORM); setShowForm(true); }}
-            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 animate-pulse-glow"
+            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 animate-pulse-glow cursor-pointer"
             style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
             + Add Task
           </button>
@@ -255,7 +255,7 @@ export default function TasksPage() {
                       return (
                         <button key={label} type="button"
                           onClick={() => setForm((f) => ({ ...f, deadline: active ? "" : iso }))}
-                          className="rounded-xl px-3 py-2 text-xs font-bold transition-all"
+                          className="rounded-xl px-3 py-2 text-xs font-bold transition-all cursor-pointer"
                           style={{
                             background: active ? "linear-gradient(135deg,#CB438B,#BF3556)" : (dark ? "rgba(203,67,139,0.12)" : "rgba(203,67,139,0.09)"),
                             color: active ? "#fff" : "#CB438B",
@@ -283,7 +283,7 @@ export default function TasksPage() {
                       const active = form.priority === p;
                       return (
                         <button key={p} type="button" onClick={() => setForm((f) => ({ ...f, priority: p }))}
-                          className="flex-1 rounded-xl py-2 text-xs font-bold transition-all"
+                          className="flex-1 rounded-xl py-2 text-xs font-bold transition-all cursor-pointer"
                           style={{
                             background: active ? m.color : (dark ? m.darkBg : m.bg),
                             color: active ? "#fff" : m.color,
@@ -298,12 +298,12 @@ export default function TasksPage() {
               </div>
               <div className="flex gap-3 justify-end">
                 <button type="button" onClick={cancelForm}
-                  className="rounded-xl px-5 py-2.5 text-sm font-bold text-fg-secondary transition-all hover:scale-105"
+                  className="rounded-xl px-5 py-2.5 text-sm font-bold text-fg-secondary transition-all hover:scale-105 cursor-pointer"
                   style={{ border: `1px solid ${inputBdr}`, background: dark ? "rgba(203,67,139,0.08)" : "rgba(203,67,139,0.06)" }}>
                   Cancel
                 </button>
                 <button type="submit"
-                  className="rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:scale-105"
+                  className="rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:scale-105 cursor-pointer"
                   style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
                   {editId ? "Save Changes" : "Add Task"}
                 </button>
@@ -338,7 +338,7 @@ export default function TasksPage() {
                   }}>
                   {/* Checkbox */}
                   <button onClick={() => handleToggle(task)} aria-label="Toggle done"
-                    className="mt-0.5 shrink-0 h-5 w-5 rounded-full border-2 transition-all flex items-center justify-center hover:scale-110"
+                    className="mt-0.5 shrink-0 h-5 w-5 rounded-full border-2 transition-all flex items-center justify-center hover:scale-110 cursor-pointer"
                     style={{
                       borderColor: task.done ? "#6C6A43" : "#CB438B",
                       background: task.done ? "#6C6A43" : "transparent",
@@ -392,18 +392,18 @@ export default function TasksPage() {
                         }}
                         title="Add to Google Calendar"
                         aria-label="Add to Google Calendar"
-                        className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110"
+                        className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110 cursor-pointer"
                         style={{ background: dark ? "rgba(66,133,244,0.15)" : "rgba(66,133,244,0.10)", color: addedToCalIds.has(task.id) ? "#4ade80" : "#4285F4" }}>
                         {addedToCalIds.has(task.id) ? "✓ Cal" : "📅"}
                       </button>
                     )}
                     <button onClick={() => startEdit(task)} aria-label="Edit"
-                      className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110"
+                      className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110 cursor-pointer"
                       style={{ background: dark ? "rgba(203,67,139,0.15)" : "rgba(203,67,139,0.10)", color: "#CB438B" }}>
                       Edit
                     </button>
                     <button onClick={() => handleDelete(task.id)} aria-label="Delete"
-                      className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110"
+                      className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110 cursor-pointer"
                       style={{ background: dark ? "rgba(191,53,86,0.15)" : "rgba(191,53,86,0.10)", color: "#BF3556" }}>
                       Del
                     </button>
@@ -423,7 +423,7 @@ export default function TasksPage() {
           <span className="text-lg">&#x1F4C5;</span>
           <p className="flex-1 text-sm font-semibold" style={{ color: "var(--fg-primary)" }}>{toast}</p>
           <button onClick={() => setToast(null)}
-            className="text-lg leading-none opacity-60 hover:opacity-100 transition-opacity"
+            className="text-lg leading-none opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
             style={{ color: "var(--fg-secondary)" }}>&#x00D7;</button>
         </div>
       )}

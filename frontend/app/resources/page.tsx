@@ -193,7 +193,7 @@ export default function ResourcesPage() {
             style={{ background: inputBg, borderColor: inputBdr, color: "var(--fg-primary)" }}
           />
           <button onClick={() => { setEditId(null); setForm(EMPTY_FORM); setShowForm(true); }}
-            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 animate-pulse-glow"
+            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 animate-pulse-glow cursor-pointer"
             style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
             + Add Link
           </button>
@@ -221,12 +221,12 @@ export default function ResourcesPage() {
                 style={{ background: inputBg, borderColor: inputBdr, color: "var(--fg-primary)" }} />
               <div className="flex gap-3 justify-end">
                 <button type="button" onClick={cancelForm}
-                  className="rounded-xl px-5 py-2.5 text-sm font-bold text-fg-secondary transition-all hover:scale-105"
+                  className="rounded-xl px-5 py-2.5 text-sm font-bold text-fg-secondary transition-all hover:scale-105 cursor-pointer"
                   style={{ border: `1px solid ${inputBdr}`, background: dark ? "rgba(203,67,139,0.08)" : "rgba(203,67,139,0.06)" }}>
                   Cancel
                 </button>
                 <button type="submit"
-                  className="rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:scale-105"
+                  className="rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:scale-105 cursor-pointer"
                   style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
                   {editId ? "Save" : "Add Link"}
                 </button>
@@ -284,12 +284,12 @@ export default function ResourcesPage() {
                       Open
                     </a>
                     <button onClick={() => startEdit(r)} aria-label="Edit"
-                      className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110"
+                      className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110 cursor-pointer"
                       style={{ background: dark ? "rgba(203,67,139,0.15)" : "rgba(203,67,139,0.10)", color: "#CB438B" }}>
                       Edit
                     </button>
                     <button onClick={() => handleDelete(r.id)} aria-label="Delete"
-                      className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110"
+                      className="rounded-lg px-2 py-1 text-xs font-bold transition-all hover:scale-110 cursor-pointer"
                       style={{ background: dark ? "rgba(191,53,86,0.15)" : "rgba(191,53,86,0.10)", color: "#BF3556" }}>
                       ✕
                     </button>
