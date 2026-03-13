@@ -563,7 +563,7 @@ export default function FocusPage() {
               ← Dashboard
             </Link>
           </div>
-          <span className="font-display text-base font-bold italic text-fg-primary">Focus Timer</span>
+          <span className="hidden font-display text-base font-bold italic text-fg-primary sm:block">Focus Timer</span>
           <div className="flex items-center gap-2">
             <button
               onClick={toggleFullscreen}
@@ -748,7 +748,7 @@ export default function FocusPage() {
       {pipOpen && !pipSupported && (
         <div
           className="fixed z-[9999] flex flex-col items-center gap-2 rounded-2xl border px-5 py-3.5 shadow-2xl backdrop-blur-2xl"
-          style={{ bottom: 96, right: 24, background: dark ? "rgba(18,4,10,0.94)" : "rgba(255,246,234,0.96)", borderColor: "rgba(203,67,139,0.50)", minWidth: 140 }}
+          style={{ bottom: 96, right: 12, background: dark ? "rgba(18,4,10,0.94)" : "rgba(255,246,234,0.96)", borderColor: "rgba(203,67,139,0.50)", minWidth: 120 }}
         >
           <span className="text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: "#CB438B" }}>
             {MODE_LABELS[mode]}
@@ -773,7 +773,7 @@ export default function FocusPage() {
             top: 24, left: "50%", transform: "translateX(-50%)",
             background: "linear-gradient(135deg, rgba(20,6,12,0.97) 0%, rgba(30,8,18,0.97) 100%)",
             borderColor: "rgba(203,67,139,0.50)",
-            minWidth: 300, maxWidth: 380,
+            width: "min(380px, calc(100vw - 1.5rem))",
             animation: "slideDown 0.4s cubic-bezier(0.16,1,0.3,1)",
           }}
         >
@@ -804,7 +804,7 @@ export default function FocusPage() {
             top: 24, left: "50%", transform: "translateX(-50%)",
             background: "linear-gradient(135deg, rgba(20,6,12,0.97) 0%, rgba(30,8,18,0.97) 100%)",
             borderColor: "rgba(203,67,139,0.50)",
-            minWidth: 300, maxWidth: 380,
+            width: "min(380px, calc(100vw - 1.5rem))",
             animation: "slideDown 0.4s cubic-bezier(0.16,1,0.3,1)",
           }}
         >
@@ -831,7 +831,7 @@ export default function FocusPage() {
       {saveModal && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
           onClick={(e) => { if (e.target === e.currentTarget) setSaveModal(null); }}>
-          <div className="relative rounded-3xl border p-7 shadow-2xl w-[340px]"
+          <div className="relative w-[calc(100vw-2rem)] max-w-[340px] rounded-3xl border p-7 shadow-2xl"
             style={{ background: dark ? "rgba(20,6,12,0.96)" : "rgba(255,246,234,0.97)", borderColor: "rgba(203,67,139,0.35)", backdropFilter: "blur(20px)" }}>
             <p className="mb-1 text-sm font-bold text-fg-primary">Save to your task list?</p>
             <p className="mb-4 text-xs text-fg-secondary">This will permanently add the task to Supabase.</p>

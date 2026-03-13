@@ -111,6 +111,33 @@ export async function fetchWeekStudyDays(token: string, from?: string): Promise<
   return res.json() as Promise<string[]>;
 }
 
+export interface StreakInfo {
+  streak: number;
+  lastActiveDate: string | null;
+  activeToday: boolean;
+}
+
+export async function fetchCurrentStreak(token: string): Promise<StreakInfo> {
+  const res = await fetch(`${BASE}/api/sessions/streak`, { headers: headers(token) });
+  if (!res.ok) return { streak: 0, lastActiveDate: null, activeToday: false };
+  return res.json() as Promise<StreakInfo>;
+}
+
+export interface WeeklySummary {
+  weekStart: string;
+  weekEnd: string;
+  focusMinutes: number;
+  tasksCompleted: number;
+  notesWritten: number;
+  activeDays: number;
+}
+
+export async function fetchWeeklySummary(token: string): Promise<WeeklySummary | null> {
+  const res = await fetch(`${BASE}/api/sessions/weekly-summary`, { headers: headers(token) });
+  if (!res.ok) return null;
+  return res.json() as Promise<WeeklySummary>;
+}
+
 /* ── Day summary ── */
 
 export interface DaySummaryTask {

@@ -86,8 +86,7 @@ export default function Home() {
         {/* RIGHT — large floral orbit */}
         <div
           aria-hidden
-          className="animate-fade-up delay-400 relative shrink-0 flex items-center justify-center"
-          style={{ width: 560, height: 560 }}
+          className="animate-fade-up delay-400 relative shrink-0 flex h-[320px] w-[320px] items-center justify-center sm:h-[420px] sm:w-[420px] lg:h-[560px] lg:w-[560px]"
         >
           {/* Outer ring — 8 petals */}
           {[0,1,2,3,4,5,6,7].map((i) => (
@@ -118,7 +117,7 @@ export default function Home() {
           <span className="absolute bottom-16 right-4 text-base animate-twinkle" style={{ animationDelay: "1.8s" }}>&#10022;</span>
 
           {/* Centre image */}
-          <div className="z-10 relative animate-pulse-gentle drop-shadow-xl" style={{ width: 140, height: 140 }}>
+          <div className="z-10 relative h-[96px] w-[96px] animate-pulse-gentle drop-shadow-xl sm:h-[120px] sm:w-[120px] lg:h-[140px] lg:w-[140px]">
             <Image src="/images/8.png" alt="center" fill className="object-contain" />
           </div>
         </div>

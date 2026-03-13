@@ -12,6 +12,8 @@ import {
   fetchTasks,
   apiPatchTask,
   fetchWeekStudyDays,
+  fetchCurrentStreak,
+  fetchWeeklySummary,
   fetchDaySummary,
   sortTasks,
   PRIORITY_META,
@@ -19,6 +21,7 @@ import {
   type Resource,
   type GCalEvent,
   type DaySummary,
+  type WeeklySummary,
   fetchResources,
   fetchGCalStatus,
   fetchGCalAuthUrl,
@@ -57,6 +60,7 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
   const displayName = [first, last].filter(Boolean).join(" ") || "diva";
 
   const [showPlanner, setShowPlanner] = useState(false);
+  const [showWeeklySummary, setShowWeeklySummary] = useState(false);
 
   // Tasks state (Supabase via backend)
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -144,6 +148,8 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
 
   // Weekly study days from backend (focus sessions) + localStorage (task completions)
   const [weekDays, setWeekDays] = useState<Set<string>>(new Set());
+  const [streak, setStreak] = useState(0);
+  const [weeklySummary, setWeeklySummary] = useState<WeeklySummary | null>(null);
   useEffect(() => {
     let cancelled = false;
 
@@ -181,6 +187,22 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
       }
     } catch {}
 
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    getToken().then(async (token) => {
+      if (!token || cancelled) return;
+      const [streakInfo, summary] = await Promise.all([
+        fetchCurrentStreak(token).catch(() => ({ streak: 0, lastActiveDate: null, activeToday: false })),
+        fetchWeeklySummary(token).catch(() => null),
+      ]);
+      if (cancelled) return;
+      setStreak(streakInfo.streak);
+      setWeeklySummary(summary);
+    });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -295,6 +317,15 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
           dark={dark}
           onClose={() => setShowPlanner(false)}
           onGenerated={(newTasks) => setTasks((prev) => [...prev, ...newTasks])}
+        />
+      )}
+
+      {showWeeklySummary && weeklySummary && (
+        <WeeklySummaryModal
+          dark={dark}
+          summary={weeklySummary}
+          streak={streak}
+          onClose={() => setShowWeeklySummary(false)}
         />
       )}
 
@@ -442,10 +473,12 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
               <WeeklyProgress
                 weekDays={weekDays}
                 dark={dark}
+                streak={streak}
                 selectedDay={selectedDay}
                 onDayClick={handleDayClick}
                 daySummary={daySummary}
                 daySummaryLoading={daySummaryLoading}
+                onOpenSummary={() => setShowWeeklySummary(true)}
               />
             </DashCard>
           </div>
@@ -694,14 +727,16 @@ function MiniTasks({
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 function WeeklyProgress({
-  weekDays, dark, selectedDay, onDayClick, daySummary, daySummaryLoading,
+  weekDays, dark, streak, selectedDay, onDayClick, daySummary, daySummaryLoading, onOpenSummary,
 }: {
   weekDays: Set<string>;
   dark: boolean;
+  streak: number;
   selectedDay: string | null;
   onDayClick: (iso: string) => void;
   daySummary: DaySummary | null;
   daySummaryLoading: boolean;
+  onOpenSummary: () => void;
 }) {
   const monday = (() => {
     const now = new Date();
@@ -726,6 +761,27 @@ function WeeklyProgress({
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <div
+          className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold"
+          style={{
+            color: "#CB438B",
+            borderColor: dark ? "rgba(203,67,139,0.35)" : "rgba(203,67,139,0.25)",
+            background: dark ? "rgba(203,67,139,0.10)" : "rgba(203,67,139,0.08)",
+          }}
+        >
+          <span>Streak</span>
+          <span className="text-sm">{streak} day{streak === 1 ? "" : "s"}</span>
+        </div>
+        <button
+          onClick={onOpenSummary}
+          className="rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-all hover:scale-105 cursor-pointer"
+          style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}
+        >
+          View Summary
+        </button>
+      </div>
+
       {/* Clickable day bars */}
       <div className="flex items-end justify-between gap-1">
         {days.map(({ label, iso, studied, isToday, isPast }) => {
@@ -844,6 +900,93 @@ function WeeklyProgress({
           ? "Perfect week! Every single day. You're unstoppable 🔥"
           : `${studiedCount} / 7 days studied this week${studiedCount >= 5 ? " 🔥" : studiedCount >= 3 ? " ✨" : ""}`}
       </p>
+    </div>
+  );
+}
+
+function WeeklySummaryModal({
+  dark,
+  summary,
+  streak,
+  onClose,
+}: {
+  dark: boolean;
+  summary: WeeklySummary;
+  streak: number;
+  onClose: () => void;
+}) {
+  const cards = [
+    { label: "Focus Minutes", value: summary.focusMinutes, note: `${Math.floor(summary.focusMinutes / 60)}h ${summary.focusMinutes % 60}m` },
+    { label: "Tasks Completed", value: summary.tasksCompleted, note: "Checked off this week" },
+    { label: "Notes Written", value: summary.notesWritten, note: "Created in Notes" },
+    { label: "Active Days", value: summary.activeDays, note: "Days with study activity" },
+  ];
+
+  const range = `${new Date(summary.weekStart + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${new Date(summary.weekEnd + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.55)" }}>
+      <div
+        className="w-full max-w-xl rounded-3xl border p-6 shadow-2xl backdrop-blur-2xl"
+        style={{
+          background: dark ? "rgba(20,6,12,0.97)" : "rgba(255,246,232,0.98)",
+          borderColor: dark ? "rgba(203,67,139,0.30)" : "rgba(203,67,139,0.22)",
+        }}
+      >
+        <div className="mb-5 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: "#CB438B", opacity: 0.75 }}>
+              weekly summary
+            </p>
+            <h3 className="text-xl font-bold text-fg-primary">Your Week at a Glance</h3>
+            <p className="text-xs text-fg-secondary mt-1">{range}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-xl border text-fg-secondary hover:opacity-70 cursor-pointer"
+            style={{ borderColor: dark ? "rgba(203,67,139,0.30)" : "rgba(203,67,139,0.22)" }}
+          >
+            x
+          </button>
+        </div>
+
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold"
+          style={{
+            color: "#CB438B",
+            borderColor: dark ? "rgba(203,67,139,0.35)" : "rgba(203,67,139,0.25)",
+            background: dark ? "rgba(203,67,139,0.10)" : "rgba(203,67,139,0.08)",
+          }}
+        >
+          Streak: {streak} day{streak === 1 ? "" : "s"}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {cards.map((c) => (
+            <div
+              key={c.label}
+              className="rounded-2xl border p-4"
+              style={{
+                background: dark ? "rgba(203,67,139,0.06)" : "rgba(203,67,139,0.05)",
+                borderColor: dark ? "rgba(203,67,139,0.22)" : "rgba(203,67,139,0.16)",
+              }}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">{c.label}</p>
+              <p className="mt-1 text-3xl font-bold" style={{ color: "#CB438B" }}>{c.value}</p>
+              <p className="mt-1 text-xs text-fg-secondary">{c.note}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 flex justify-end">
+          <button
+            onClick={onClose}
+            className="rounded-2xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:scale-105 cursor-pointer"
+            style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
