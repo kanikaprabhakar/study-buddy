@@ -51,6 +51,7 @@ export async function ensureTasksSchema() {
 			created_at timestamptz not null default now()
 		)
 	`;
+	await sql`alter table public.tasks enable row level security`;
 	await sql`create index if not exists tasks_clerk_id_idx on public.tasks (clerk_id)`;
 	await sql`alter table public.tasks add column if not exists completed_on date`;
 }
@@ -66,6 +67,7 @@ export async function ensureSessionsSchema() {
 			created_at   timestamptz not null default now()
 		)
 	`;
+	await sql`alter table public.study_sessions enable row level security`;
 	await sql`create index if not exists study_sessions_clerk_id_idx on public.study_sessions (clerk_id)`;
 	await sql`
 		create index if not exists study_sessions_studied_on_idx
@@ -84,6 +86,7 @@ export async function ensureResourcesSchema() {
 			created_at  timestamptz not null default now()
 		)
 	`;
+	await sql`alter table public.resources enable row level security`;
 	await sql`create index if not exists resources_clerk_id_idx on public.resources (clerk_id)`;
 }
 
@@ -99,6 +102,7 @@ export async function ensureNotesSchema() {
 			updated_at  timestamptz not null default now()
 		)
 	`;
+	await sql`alter table public.notes enable row level security`;
 	await sql`create index if not exists notes_clerk_id_idx on public.notes (clerk_id)`;
 }
 

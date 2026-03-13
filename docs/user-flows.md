@@ -46,13 +46,13 @@ This document describes how users interact with Zenith.
 
 ---
 
-## Flow 5: Striver DSA Sheet Tracking
+## Flow 5: Notes
 
-1. User opens DSA Tracker  
-2. User browses topic list  
-3. User marks a question as completed  
-4. System optionally flags revision due date  
-5. Progress updates per topic  
+1. User opens Notes page  
+2. User creates a new note  
+3. User writes content using the rich text toolbar  
+4. Note auto-saves to their account  
+5. User can browse, edit, or delete notes from the notes list  
 
 ---
 

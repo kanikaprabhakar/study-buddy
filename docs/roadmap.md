@@ -21,7 +21,8 @@ This roadmap defines the correct build order for the MVP.
 8. Weekly planner generation (Mon–Fri structure)  
 9. Pomodoro timer + session saving  
 10. Quotes system + streak tracking  
-11. DSA tracker (Striver sheet progress)
+11. Notes (rich text editor, auto-save)  
+12. Resources / Bookmarks (save and manage links)  
 
 ---
 
@@ -48,5 +49,6 @@ MVP is complete when users can:
 - Sign up and log in  
 - Generate a weekly study plan  
 - Track tasks and Pomodoro sessions  
-- Mark DSA questions complete  
+- Write and save notes  
+- Save and manage resource bookmarks  
 - Maintain streaks and motivation  

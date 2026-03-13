@@ -18,6 +18,7 @@ import {
   fetchGCalStatus,
   apiGCalAddEvent,
 } from "@/lib/tasks";
+import { PlannerModal } from "@/components/dashboard/PlannerModal";
 
 const FLOATERS = [
   { src: "/images/14.png", w: 100, top: "3%",    left: "0%",   anim: "animate-float-slow",   delay: "0s" },
@@ -51,6 +52,7 @@ export default function TasksPage() {
   const [gcalConnected, setGcalConnected] = useState(false);
   const [addedToCalIds, setAddedToCalIds] = useState<Set<string>>(new Set());
   const [toast, setToast]         = useState<string | null>(null);
+  const [showPlanner, setShowPlanner] = useState(false);
 
   // Load tasks from API on mount
   useEffect(() => {
@@ -218,11 +220,18 @@ export default function TasksPage() {
               </button>
             ))}
           </div>
-          <button onClick={() => { setEditId(null); setForm(EMPTY_FORM); setShowForm(true); }}
-            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 animate-pulse-glow cursor-pointer"
-            style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
-            + Add Task
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowPlanner(true)}
+              className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 cursor-pointer"
+              style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)", opacity: 0.85 }}>
+              Generate Plan
+            </button>
+            <button onClick={() => { setEditId(null); setForm(EMPTY_FORM); setShowForm(true); }}
+              className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 animate-pulse-glow cursor-pointer"
+              style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}>
+              + Add Task
+            </button>
+          </div>
         </div>
 
         {/* Add / Edit form */}
@@ -415,6 +424,14 @@ export default function TasksPage() {
         )}
         </>)}
       </div>
+
+      {showPlanner && (
+        <PlannerModal
+          dark={dark}
+          onClose={() => setShowPlanner(false)}
+          onGenerated={(newTasks) => setTasks((prev) => [...newTasks, ...prev])}
+        />
+      )}
 
       {/* Add to Calendar success toast */}
       {toast && (

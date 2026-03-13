@@ -9,7 +9,7 @@ Version: 1.0
 
 ### 1.1 Purpose
 
-This document describes the requirements for Zenith, an aesthetic study planner app that combines scheduling, Pomodoro focus tools, motivation features, and DSA tracking in one place.
+This document describes the requirements for Zenith, an aesthetic study planner app that combines scheduling, Pomodoro focus tools, motivation features, and personal productivity in one place.
 
 The goal is to clearly define what the app should do before development begins.
 
@@ -22,7 +22,7 @@ Zenith is a web application that helps students and self-learners:
 - Plan weekly study routines  
 - Sync schedules with Google Calendar  
 - Stay focused using Pomodoro timers  
-- Track Striver’s DSA Sheet progress  
+
 - Automatically balance learning and revision days  
 - Stay motivated with quotes, streaks, and summaries  
 
@@ -32,8 +32,8 @@ The app focuses on being simple, guided, and visually calming rather than comple
 
 ### 1.3 Target Users
 
-- College students preparing for placements  
-- Learners practicing DSA consistently  
+- College students balancing coursework and personal projects  
+- Learners who want a structured weekly routine  
 - Anyone wanting an aesthetic productivity planner  
 
 ---
@@ -48,7 +48,8 @@ Core modules include:
 
 - Weekly Planner  
 - Pomodoro Timer  
-- DSA Tracker  
+- Notes  
+- Resources / Bookmarks  
 - Motivation System  
 - Calendar Integration  
 
@@ -80,7 +81,7 @@ The dashboard must display:
 - Weekly study schedule  
 - Today’s tasks  
 - Pomodoro focus button  
-- DSA progress summary  
+- Streak counter  
 - Motivation quote of the day  
 
 ---
@@ -134,15 +135,18 @@ Timer must support:
 
 ---
 
-### 3.7 Striver DSA Sheet Tracker
+### 3.7 Notes
 
-- Users can browse DSA topics and questions  
-- Users can mark questions as:
+- Users can create, edit, and delete personal notes  
+- Notes support rich text formatting (bold, italic, underline, colour, links, lists)  
+- Notes are auto-saved to the user's account  
 
-  - Completed  
-  - Needs Revision  
+---
 
-- The system should generate revision reminders automatically  
+### 3.8 Resources / Bookmarks
+
+- Users can save links/resources with a name and URL  
+- Resources are listed per user and can be deleted  
 
 ---
 
@@ -186,7 +190,7 @@ The first release should include:
 - Dashboard  
 - Pomodoro timer  
 - Weekly planner generation  
-- Manual DSA tracker  
+- Notes and Resources  
 - Quotes and streak counter  
 
 Google Calendar sync can be Phase 2.

@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { UserButton, useAuth } from "@clerk/nextjs";
 import { useTheme } from "@/lib/theme";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PlannerModal } from "@/components/dashboard/PlannerModal";
 import type { Quote } from "@/lib/quoterism";
 import {
   fetchTasks,
@@ -54,6 +55,8 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
   const first = firstName?.trim() || "";
   const last  = lastName?.trim()  || "";
   const displayName = [first, last].filter(Boolean).join(" ") || "diva";
+
+  const [showPlanner, setShowPlanner] = useState(false);
 
   // Tasks state (Supabase via backend)
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -256,9 +259,10 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
   function fmtTime(s: number) {
     return `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
   }
-  // Live clock — ticks every second
-  const [now, setNow] = useState(() => new Date());
+  // Live clock — ticks every second (null on SSR to avoid hydration mismatch)
+  const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
+    setNow(new Date());
     const tick = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(tick);
   }, []);
@@ -285,6 +289,14 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
   }, [selectedDay, getToken]);
   return (
     <main className="relative min-h-screen overflow-x-hidden animate-gradient-bg">
+
+      {showPlanner && (
+        <PlannerModal
+          dark={dark}
+          onClose={() => setShowPlanner(false)}
+          onGenerated={(newTasks) => setTasks((prev) => [...prev, ...newTasks])}
+        />
+      )}
 
       {/* Blobs */}
       <div aria-hidden className="pointer-events-none fixed top-[-100px] left-[-100px] h-[400px] w-[400px] rounded-full blur-3xl opacity-25 animate-float-slow"   style={{ background: "#CB438B" }} />
@@ -386,10 +398,10 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
         {/* ── Live date & time ── */}
         <div className="mb-8 animate-fade-up flex flex-col items-center gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
           <p className="font-display text-3xl font-bold text-fg-primary sm:text-4xl">
-            {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+            {now?.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }) ?? ""}
           </p>
           <p className="font-display text-2xl font-bold tabular-nums sm:text-3xl" style={{ color: "#CB438B" }}>
-            {now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" })}
+            {now?.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" }) ?? ""}
           </p>
         </div>
 
@@ -410,6 +422,13 @@ export function DashboardShell({ firstName, lastName, isNew }: Props) {
           {/* Tasks mini-view */}
           <DashCard title="My Tasks" href="/tasks">
             <MiniTasks tasks={tasks} dark={dark} onToggle={handleToggle} />
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowPlanner(true); }}
+              className="relative z-10 mt-4 flex items-center gap-2 rounded-2xl px-4 py-2 text-xs font-bold text-white shadow-md transition-all hover:scale-105 cursor-pointer"
+              style={{ background: "linear-gradient(135deg,#CB438B,#BF3556)" }}
+            >
+              Generate Weekly Plan
+            </button>
           </DashCard>
 
           {/* Resources compact */}

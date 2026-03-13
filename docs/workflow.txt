@@ -7,7 +7,7 @@ Step 1: Lock the Core Idea
 
 Write the one-liner:
 
-Zenith is an aesthetic study planner app with built-in scheduling, Pomodoro focus, DSA tracking, and motivation.
+Zenith is an aesthetic study planner app with built-in scheduling, Pomodoro focus, notes, resources, and motivation.
 
 Do not expand scope yet.
 
@@ -23,7 +23,7 @@ Weekly planner
 
 Pomodoro timer
 
-Striver sheet tracker
+Notes + Resources
 
 Quotes + streak
 
@@ -64,7 +64,9 @@ Weekly Planner Module
 
 Pomodoro Module
 
-DSA Tracker Module
+Notes Module
+
+Resources Module
 
 Motivation Module
 
@@ -82,9 +84,9 @@ study_tasks
 
 pomodoro_sessions
 
-dsa_questions
+notes
 
-dsa_progress
+resources
 
 quotes
 
@@ -182,19 +184,17 @@ Milestone:
 
 App feels alive, not robotic
 
-Step 14: Striver Sheet Tracker
+Step 14: Notes + Resources
 
 Workflow:
 
-Seed dsa_questions once
+User creates notes with rich text editor
 
-User checks questions off
-
-Progress stored in dsa_progress
+User saves bookmarks/links
 
 Milestone:
 
-User can track DSA properly
+User has a personal workspace beyond tasks
 
 PHASE 4: Polish the Aesthetic Planner Experience
 Step 15: UI Styling + Theme System
@@ -244,9 +244,9 @@ Calendar becomes a bonus, not a dependency
 
 Step 18: Revision Automation
 
-Add spaced repetition:
+Add spaced repetition for tasks:
 
-Completed question → revision due in 3 days
+Completed task → optional revision reminder in X days
 
 Auto-create revision tasks
 

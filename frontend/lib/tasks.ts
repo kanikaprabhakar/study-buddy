@@ -273,6 +273,46 @@ export async function apiPatchNote(
   return normaliseNote(await res.json() as Record<string, unknown>);
 }
 
+/* ── Weekly Planner Generator ── */
+
+export type PlanIntensity = "light" | "moderate" | "intense";
+
+export interface PreviewTask {
+  day: number;
+  title: string;
+  priority: Priority;
+  deadline: string;
+}
+
+export async function apiGeneratePlan(
+  token: string,
+  data: { intensity: PlanIntensity; subject: string; weekStart: string },
+): Promise<{ tasks: PreviewTask[]; fallback: boolean }> {
+  const res = await fetch(`${BASE}/api/tasks/generate-plan`, {
+    method: "POST",
+    headers: headers(token),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`apiGeneratePlan: ${res.status}`);
+  const body = await res.json() as { tasks: PreviewTask[]; fallback?: boolean };
+  return { tasks: body.tasks, fallback: body.fallback === true };
+}
+
+export async function apiConfirmPlan(
+  token: string,
+  tasks: PreviewTask[],
+): Promise<Task[]> {
+  const res = await fetch(`${BASE}/api/tasks/confirm-plan`, {
+    method: "POST",
+    headers: headers(token),
+    body: JSON.stringify({ tasks }),
+  });
+  if (!res.ok) throw new Error(`apiConfirmPlan: ${res.status}`);
+  const rows = await res.json() as Array<Record<string, unknown>>;
+  return rows.map(normaliseRow);
+}
+
+
 export async function apiDeleteNote(token: string, id: string): Promise<void> {
   const res = await fetch(`${BASE}/api/notes/${id}`, {
     method: "DELETE",
